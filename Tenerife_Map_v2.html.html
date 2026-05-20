@@ -1,0 +1,2916 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Tenerife · Sept 5–13, 2026 · Cinema Cut</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bagel+Fat+One&family=Fredoka:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    /* sea & sky */
+    --sea:#00b4d8; --sea-deep:#0077b6; --sea-light:#caf0f8; --sea-mid:#48cae4;
+    /* island */
+    --sand:#ffe066; --sand-deep:#ffb627; --sand-shadow:#e8930b;
+    /* sun + accents */
+    --sun:#ffc93c; --coral:#ff6b35; --volcano:#e63946; --pink:#ff6b9d;
+    --palm:#43aa8b; --palm-deep:#2d6a4f; --leaf:#7cb342;
+    /* paper + ink */
+    --paper:#fff8e1; --paper-2:#fffdf3;
+    --ink:#1d2a3a; --ink-2:#4a5568; --ink-3:#718096;
+    --rule: rgba(29,42,58,0.14); --rule-2: rgba(29,42,58,0.06);
+    /* compat fallback (some legacy refs) */
+    --gold:#ffc93c; --gold-bright:#ffd866; --ember:#ff6b35; --moon:#fff;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;color:var(--ink);font-family:"Fredoka",system-ui,sans-serif;-webkit-font-smoothing:antialiased;font-weight:400}
+  body{min-height:100vh;overflow-x:hidden;
+    background:
+      radial-gradient(1200px 700px at 80% 10%, rgba(255,201,60,0.20), transparent 60%),
+      radial-gradient(900px 700px at 10% 90%, rgba(255,107,53,0.10), transparent 60%),
+      linear-gradient(180deg, #caf0f8 0%, #90e0ef 35%, #48cae4 100%);
+  }
+  img{display:block}
+
+  /* ============ top bar ============ */
+  .topbar{
+    position:fixed;top:0;left:0;right:0;z-index:50;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:14px 28px;
+    background:linear-gradient(180deg, rgba(202,240,248,0.92), rgba(202,240,248,0.5) 70%, transparent);
+    backdrop-filter:blur(8px);
+    pointer-events:none;
+  }
+  .topbar > *{pointer-events:auto}
+  .brand{font-family:"Bagel Fat One",cursive;font-size:32px;letter-spacing:0.01em;color:var(--coral);line-height:1;
+    text-shadow:2px 2px 0 var(--sun), 4px 4px 0 rgba(29,42,58,0.18);}
+  .brand em{font-style:normal;color:var(--sea-deep)}
+  .topmeta{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:var(--ink);font-weight:700;display:flex;gap:18px;align-items:center}
+  .topmeta .pill{
+    background:var(--sun);border-radius:999px;padding:6px 14px;color:var(--ink);
+    border:2px solid var(--ink);box-shadow:3px 3px 0 var(--ink);
+  }
+  .topmeta .pill.coral{background:var(--coral);color:#fff}
+  .topmeta .dot{width:6px;height:6px;border-radius:50%;background:#fff;display:inline-block;vertical-align:1px;margin-right:8px;box-shadow:0 0 0 2px var(--ink)}
+
+  /* ============ cinema ============ */
+  .cinema{
+    position:relative;height:100vh;min-height:520px;max-height:1080px;
+    overflow:hidden;clip-path:inset(0);
+    background:var(--sea-deep);isolation:isolate;
+  }
+  .scene{
+    position:absolute;inset:0;
+    opacity:0;visibility:hidden;pointer-events:none;
+    transition:opacity 1.1s ease,visibility 1.1s;
+    /* flex column so sections stack and never overlap */
+    display:flex;flex-direction:column;
+  }
+  .scene.active{opacity:1;visibility:visible;pointer-events:auto}
+  @keyframes kenburns{from{transform:scale(1.0)}to{transform:scale(1.12) translate(-2%,-1%)}}
+
+  /* ---- background layers ---- */
+  .scene .bg-fallback{position:absolute;inset:0;z-index:0}
+  .scene .scene-poster{
+    position:absolute;inset:0;z-index:1;pointer-events:none;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    text-align:center;padding:40px;transition:opacity 0.5s;
+  }
+  .scene .scene-poster .pi{font-size:clamp(48px,8vw,120px);line-height:1;margin-bottom:8px;filter:drop-shadow(0 4px 0 rgba(0,0,0,0.3))}
+  .scene .scene-poster .pn{
+    font-family:"Bagel Fat One",cursive;font-size:clamp(32px,5.5vw,88px);
+    line-height:0.92;color:var(--sun);
+    text-shadow:3px 3px 0 var(--coral),6px 6px 0 rgba(0,0,0,0.35);
+  }
+  .scene .scene-poster .pc{
+    font-family:"Space Mono",monospace;font-size:11px;letter-spacing:0.22em;text-transform:uppercase;
+    color:#fff;font-weight:700;margin-top:10px;opacity:0.9;text-shadow:0 1px 4px rgba(0,0,0,0.5);
+  }
+  .scene .bg-photo{
+    position:absolute;inset:0;z-index:2;
+    background-size:cover;background-position:center;
+    opacity:0;transition:opacity 0.8s ease;
+  }
+  .scene .bg-photo.loaded{opacity:1}
+  .scene.active .bg-photo.loaded{animation:kenburns 16s ease-out forwards}
+  .scene .vignette{
+    position:absolute;inset:0;z-index:3;pointer-events:none;
+    background:
+      linear-gradient(180deg,rgba(0,20,50,0.6) 0%,rgba(0,20,50,0.05) 28%,rgba(0,20,50,0.05) 55%,rgba(0,20,50,0.88) 100%),
+      linear-gradient(90deg,rgba(0,20,50,0.5) 0%,transparent 55%);
+  }
+
+  /* ---- chrome (above vignette) ---- */
+  .scene-chrome{
+    position:relative;z-index:4;
+    flex:1;min-height:0;
+    display:flex;flex-direction:column;
+    padding:76px 40px 0;          /* top pad clears topbar */
+    pointer-events:none;
+  }
+
+  /* row 1: eyebrow left, map+thumbs right */
+  .scene-top{
+    display:flex;align-items:flex-start;justify-content:space-between;
+    gap:16px;flex-shrink:0;margin-bottom:10px;
+    pointer-events:auto;
+  }
+  .scene .top-eyebrow{
+    display:inline-flex;align-items:center;gap:12px;flex-shrink:0;
+    background:var(--sun);color:var(--ink);padding:8px 14px 8px 10px;
+    border:3px solid var(--ink);border-radius:14px;box-shadow:5px 5px 0 rgba(29,42,58,0.25);
+    transform:rotate(-1.5deg);
+  }
+  .scene .top-eyebrow .num{
+    font-family:"Bagel Fat One",cursive;font-size:36px;color:var(--coral);
+    line-height:0.8;text-shadow:2px 2px 0 var(--ink);
+  }
+  .scene .top-eyebrow .sep{display:none}
+  .scene .top-eyebrow .col{
+    display:flex;flex-direction:column;gap:2px;line-height:1.2;
+    font-family:"Space Mono",monospace;font-size:10px;letter-spacing:0.14em;
+    text-transform:uppercase;font-weight:700;
+  }
+  .scene .top-eyebrow .col b{color:var(--ink);font-weight:700;font-size:11px}
+
+  .scene-right{
+    display:flex;flex-direction:column;gap:8px;align-items:flex-end;
+    flex-shrink:0;pointer-events:auto;
+  }
+  .scene .map-inset{
+    width:clamp(150px,17vw,230px);
+    background:var(--paper);border:2.5px solid var(--ink);border-radius:12px;padding:8px;
+    box-shadow:4px 4px 0 rgba(29,42,58,0.28);transform:rotate(0.8deg);
+  }
+  .scene .map-inset .h{
+    font-family:"Space Mono",monospace;font-size:9px;letter-spacing:0.14em;text-transform:uppercase;
+    font-weight:700;color:var(--ink);margin-bottom:6px;display:flex;justify-content:space-between;
+  }
+  .scene .map-inset .h b{color:var(--coral)}
+  .scene .map-inset svg{display:block;width:100%;height:auto}
+  .scene .supp{display:flex;flex-direction:column;gap:6px;width:clamp(150px,17vw,230px)}
+  .supp-thumb{
+    height:72px;border-radius:8px;overflow:hidden;position:relative;
+    border:2.5px solid var(--ink);background-size:cover;background-position:center;
+    box-shadow:3px 3px 0 rgba(29,42,58,0.28);
+    cursor:pointer;transition:transform 0.15s,box-shadow 0.15s;
+  }
+  .supp-thumb:first-child{transform:rotate(-1.2deg)}
+  .supp-thumb:nth-child(2){transform:rotate(1deg)}
+  .supp-thumb:hover{transform:rotate(0) translate(-2px,-2px)!important;box-shadow:6px 6px 0 rgba(29,42,58,0.35)}
+  .supp-thumb.active{border-color:var(--coral);box-shadow:3px 3px 0 var(--coral)}
+  .supp-thumb .cap{
+    position:absolute;left:0;right:0;bottom:0;padding:4px 8px;
+    font-family:"Bagel Fat One",cursive;font-size:11px;color:#fff;
+    background:linear-gradient(0deg,rgba(29,42,58,0.88),transparent);
+  }
+
+  /* row 2: title+lede — flex grow to fill space */
+  .scene-mid{
+    flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;
+    padding:8px 0;
+  }
+  .scene .center h2{
+    font-family:"Bagel Fat One",cursive;font-weight:400;
+    font-size:clamp(32px,4.8vw,80px);
+    line-height:0.95;margin:0 0 8px;letter-spacing:0.005em;color:var(--sun);
+    text-shadow:3px 3px 0 var(--coral),6px 6px 0 rgba(29,42,58,0.3);
+    max-width:min(580px,55vw);
+  }
+  .scene .center h2 em{font-style:normal;color:#fff;text-shadow:3px 3px 0 var(--sea-deep),6px 6px 0 rgba(29,42,58,0.3)}
+  .scene .center .lede{
+    font-size:clamp(12px,1.3vw,15px);line-height:1.5;color:#fff;
+    max-width:min(480px,52vw);font-weight:500;
+    text-shadow:0 2px 10px rgba(0,0,0,0.65);margin:0;
+  }
+
+  /* row 3: schedule + stats */
+  .scene .bottom{
+    display:flex;justify-content:space-between;align-items:flex-end;gap:20px;
+    padding:8px 0 14px;flex-shrink:0;pointer-events:auto;
+  }
+  .schedule{display:flex;flex-direction:column;gap:5px;max-width:min(460px,52vw)}
+  .sched-row{
+    display:flex;align-items:flex-start;gap:10px;font-size:12.5px;color:var(--ink);
+    background:var(--paper);border:2.5px solid var(--ink);border-radius:8px;
+    padding:6px 10px;box-shadow:2px 2px 0 rgba(29,42,58,0.22);
+    transform:rotate(-0.3deg);transition:transform 0.15s,box-shadow 0.15s,background 0.2s;
+  }
+  .sched-row:nth-child(2n){transform:rotate(0.4deg);background:var(--paper-2)}
+  .sched-row:nth-child(3n){transform:rotate(-0.6deg);background:#fff}
+  .sched-row.clickable{cursor:pointer}
+  .sched-row.clickable::after{
+    content:"↗";color:var(--ink-3);margin-left:4px;font-size:12px;
+    align-self:flex-start;flex-shrink:0;transition:color 0.15s;
+  }
+  .sched-row.clickable:hover{transform:translate(-2px,-2px)!important;box-shadow:4px 4px 0 rgba(29,42,58,0.28)}
+  .sched-row.clickable:hover::after{color:var(--coral)}
+  .sched-row.active{background:var(--sun)!important;box-shadow:3px 3px 0 var(--coral)}
+  .sched-row.active .t{color:var(--ink)}
+  .sched-row .t{
+    font-family:"Space Mono",monospace;font-size:10px;color:var(--coral);font-weight:700;
+    letter-spacing:0.02em;min-width:42px;padding-top:1px;flex-shrink:0;
+  }
+  .sched-row .w{flex:1;line-height:1.4;font-weight:500}
+  .sched-row .w b{color:var(--sea-deep);font-weight:700}
+  .sched-row .tag{
+    display:inline-block;font-family:"Space Mono",monospace;font-size:8px;
+    letter-spacing:0.1em;text-transform:uppercase;color:#fff;background:var(--coral);
+    padding:2px 5px;border-radius:3px;margin-left:4px;vertical-align:1px;font-weight:700;
+  }
+  .stats{display:flex;flex-direction:column;gap:6px;align-items:flex-end;flex-shrink:0}
+  .stat{
+    display:flex;flex-direction:column;align-items:flex-end;gap:1px;min-width:130px;
+    border:2.5px solid var(--ink);border-radius:8px;
+    padding:6px 10px;box-shadow:2px 2px 0 rgba(29,42,58,0.25);
+    transform:rotate(0.5deg);
+  }
+  .stat:nth-child(1){background:var(--sea-deep);color:#fff}
+  .stat:nth-child(2){background:var(--coral);color:#fff;transform:rotate(-0.7deg)}
+  .stat:nth-child(3){background:var(--palm);color:#fff;transform:rotate(0.5deg)}
+  .stat .k{font-family:"Space Mono",monospace;font-size:8px;letter-spacing:0.14em;text-transform:uppercase;opacity:0.85;font-weight:700}
+  .stat .v{font-family:"Bagel Fat One",cursive;font-size:15px;line-height:1.1}
+  .stat .v em{font-style:normal;color:var(--sun);text-shadow:1px 1px 0 rgba(0,0,0,0.25)}
+
+  /* ============ filmstrip ============ */
+  .filmstrip{
+    position:absolute;left:0;right:0;bottom:0;z-index:30;
+    padding:14px 28px 18px;
+    background:linear-gradient(0deg, rgba(0,30,60,0.92), rgba(0,30,60,0.6) 60%, transparent);
+    display:flex;align-items:center;gap:12px;
+  }
+  .nav-btn{
+    flex-shrink:0;width:42px;height:42px;border-radius:50%;border:2.5px solid var(--ink);
+    background:var(--sun);color:var(--ink);
+    cursor:pointer;font-family:"Bagel Fat One",cursive;font-size:22px;
+    display:flex;align-items:center;justify-content:center;transition:transform 0.15s;
+    box-shadow:3px 3px 0 rgba(29,42,58,0.4);
+  }
+  .nav-btn:hover{transform:translate(-2px,-2px);box-shadow:5px 5px 0 rgba(29,42,58,0.4)}
+  .play-btn{
+    flex-shrink:0;padding:0 18px;height:42px;border-radius:21px;
+    border:2.5px solid var(--ink);background:var(--coral);color:#fff;
+    font-family:"Space Mono",monospace;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;
+    cursor:pointer;font-weight:700;box-shadow:3px 3px 0 rgba(29,42,58,0.4);
+    transition:transform 0.15s;
+  }
+  .play-btn:hover{transform:translate(-2px,-2px);box-shadow:5px 5px 0 rgba(29,42,58,0.4)}
+  .play-btn.paused{background:var(--sun);color:var(--ink)}
+  .strip{flex:1;display:flex;gap:8px;overflow-x:auto;scrollbar-width:none}
+  .strip::-webkit-scrollbar{display:none}
+  .chip{
+    flex:1;min-width:0;
+    border:2.5px solid var(--ink);border-radius:10px;overflow:hidden;
+    background:var(--sea-deep);cursor:pointer;transition:all 0.2s;position:relative;
+    height:64px;box-shadow:2px 2px 0 rgba(29,42,58,0.4);
+  }
+  .chip:hover{transform:translate(-1px,-1px);box-shadow:3px 3px 0 rgba(29,42,58,0.4)}
+  .chip.active{border-color:var(--sun);box-shadow:0 0 0 2px var(--sun),3px 3px 0 rgba(29,42,58,0.4)}
+  .chip .ph{position:absolute;inset:0;background-size:cover;background-position:center;opacity:0.55;transition:opacity 0.3s}
+  .chip.active .ph{opacity:1}
+  .chip .ph-fallback{position:absolute;inset:0}
+  .chip .ph-grad{position:absolute;inset:0;background:linear-gradient(0deg, rgba(29,42,58,0.85), rgba(29,42,58,0.15))}
+  .chip .lbl{
+    position:absolute;left:9px;bottom:5px;right:9px;
+    font-family:"Space Mono",monospace;font-size:10px;font-weight:700;letter-spacing:0.04em;color:#fff;
+    text-shadow:1px 1px 0 rgba(0,0,0,0.6);display:flex;justify-content:space-between;align-items:end
+  }
+  .chip .lbl .num{font-family:"Bagel Fat One",cursive;color:var(--sun);font-size:16px;letter-spacing:0;text-shadow:1.5px 1.5px 0 var(--ink)}
+  .chip .progress{position:absolute;left:0;right:0;bottom:0;height:3px;background:var(--sun);width:0;transition:width 0.1s linear}
+  .chip.active.playing .progress{transition:none}
+
+  /* arrow buttons floating mid-screen */
+  .scene-arrow{
+    position:absolute;top:50%;transform:translateY(-50%);z-index:25;
+    width:54px;height:54px;border-radius:50%;border:3px solid var(--ink);
+    background:var(--sun);color:var(--ink);
+    cursor:pointer;font-size:24px;font-family:"Bagel Fat One",cursive;
+    display:flex;align-items:center;justify-content:center;transition:transform 0.2s;
+    box-shadow:4px 4px 0 rgba(29,42,58,0.4);
+  }
+  .scene-arrow:hover{transform:translateY(-50%) scale(1.08)}
+  .scene-arrow.prev{left:24px}
+  .scene-arrow.next{right:24px}
+
+  /* SVG map inset styles - vacation palette */
+  .island-fill{fill:url(#sandGrad)}
+  .island-stroke{fill:none;stroke:var(--sand-shadow);stroke-width:2;stroke-linejoin:round}
+  .route-dim{fill:none;stroke:rgba(255,107,53,0.3);stroke-width:1.4;stroke-dasharray:3 4}
+  .route-live{fill:none;stroke:var(--coral);stroke-width:2.6;stroke-linecap:round;
+    stroke-dasharray:1000; stroke-dashoffset:1000;
+  }
+  .scene.active .route-live{animation: drawRoute 2s ease forwards 0.4s}
+  @keyframes drawRoute{to{stroke-dashoffset:0}}
+  .mk{fill:var(--coral);stroke:var(--ink);stroke-width:1.2}
+  .mk.start{fill:#fff;stroke:var(--ink)}
+  .mk.summit{fill:var(--volcano);stroke:var(--ink)}
+  .mk.star{fill:var(--pink);stroke:var(--ink)}
+  .mk-label{font-family:"Space Mono",monospace;font-size:8px;font-weight:700;fill:var(--ink);letter-spacing:0.02em}
+  .scene .map-inset .pulse{fill:rgba(255,107,53,0.5);transform-origin:center;transform-box:fill-box}
+  .scene.active .map-inset .pulse{animation:pulseDot 2.5s ease-out infinite}
+  @keyframes pulseDot{0%{r:3;opacity:0.7}100%{r:14;opacity:0}}
+
+  /* ===== gradient fallback variants ===== */
+  .fb-coast{background:
+    repeating-linear-gradient(90deg, rgba(60,120,150,0.15) 0 12px, transparent 12px 28px),
+    linear-gradient(180deg,#1a3a52 0%, #0a1c2c 50%, #050d18 100%);}
+  .fb-anaga{background:
+    radial-gradient(800px 600px at 30% 40%, rgba(80,140,90,0.25), transparent 70%),
+    repeating-linear-gradient(-30deg, rgba(80,140,90,0.12) 0 14px, transparent 14px 28px),
+    linear-gradient(180deg,#1d3026 0%, #0e1a14 100%);}
+  .fb-laguna{background:
+    radial-gradient(900px 600px at 60% 50%, rgba(200,150,80,0.18), transparent 70%),
+    repeating-linear-gradient(20deg, rgba(200,150,80,0.08) 0 14px, transparent 14px 32px),
+    linear-gradient(180deg,#3a2818 0%, #1c130a 100%);}
+  .fb-garachico{background:
+    radial-gradient(800px 600px at 50% 60%, rgba(60,120,180,0.25), transparent 70%),
+    repeating-linear-gradient(70deg, rgba(60,120,180,0.1) 0 16px, transparent 16px 36px),
+    linear-gradient(180deg,#152734 0%, #0a141c 100%);}
+  .fb-teide{background:
+    radial-gradient(700px 500px at 50% 55%, rgba(208,90,50,0.4), transparent 65%),
+    repeating-linear-gradient(45deg, rgba(208,90,50,0.1) 0 14px, transparent 14px 30px),
+    linear-gradient(180deg,#2a1410 0%, #160806 100%);}
+  .fb-stargaze{background:
+    radial-gradient(2px 2px at 12% 22%, #fff 50%, transparent 51%),
+    radial-gradient(1px 1px at 78% 18%, #fff 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 42% 62%, #fff 50%, transparent 51%),
+    radial-gradient(1px 1px at 84% 72%, #fff 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 55% 38%, #fff 50%, transparent 51%),
+    radial-gradient(1px 1px at 28% 78%, #fff 50%, transparent 51%),
+    radial-gradient(2px 2px at 18% 52%, #fff 50%, transparent 51%),
+    radial-gradient(1px 1px at 65% 88%, #fff 50%, transparent 51%),
+    radial-gradient(1px 1px at 92% 42%, #fff 50%, transparent 51%),
+    radial-gradient(900px 700px at 50% 60%, rgba(60,80,120,0.2), transparent 70%),
+    linear-gradient(180deg,#0a1424 0%, #040810 100%);}
+  .fb-summit{background:
+    radial-gradient(700px 500px at 50% 70%, rgba(220,180,120,0.3), transparent 65%),
+    radial-gradient(2px 2px at 22% 28%, #fff 50%, transparent 51%),
+    radial-gradient(1px 1px at 72% 18%, #fff 50%, transparent 51%),
+    radial-gradient(1px 1px at 88% 38%, #fff 50%, transparent 51%),
+    linear-gradient(180deg,#2a1808 0%, #0a0608 50%, #040408 100%);}
+  .fb-depart{background:
+    repeating-linear-gradient(120deg, rgba(232,176,74,0.12) 0 14px, transparent 14px 30px),
+    linear-gradient(180deg,#2a2010 0%, #150f06 100%);}
+
+  /* ====== book grid ====== */
+  .book-grid{
+    display:grid;grid-template-columns:1fr 1fr;gap:28px;
+    margin-bottom:48px;align-items:start;
+  }
+  @media(max-width:760px){.book-grid{grid-template-columns:1fr;}}
+  .book-eyebrow{
+    font-family:"Space Mono",monospace;font-size:10px;letter-spacing:0.18em;
+    text-transform:uppercase;color:var(--coral);font-weight:700;margin-bottom:12px;
+  }
+  .book-urgent{
+    background:var(--paper);border:3px solid var(--ink);border-radius:18px;
+    padding:20px;box-shadow:6px 6px 0 rgba(29,42,58,0.25);
+  }
+  .book-items{display:flex;flex-direction:column;gap:10px}
+  .book-item{
+    display:flex;align-items:flex-start;gap:12px;
+    background:#fff;border:2px solid var(--ink);border-radius:12px;
+    padding:10px 12px;box-shadow:2px 2px 0 rgba(29,42,58,0.18);
+  }
+  .bi-icon{font-size:22px;flex-shrink:0;margin-top:1px}
+  .bi-body{flex:1;font-size:12.5px;line-height:1.45;color:var(--ink)}
+  .bi-body b{display:block;font-size:13px;font-weight:700;margin-bottom:2px}
+  .bi-body span{color:var(--ink-2)}
+  .bi-status{
+    flex-shrink:0;font-family:"Space Mono",monospace;font-size:9px;letter-spacing:0.1em;
+    font-weight:700;padding:4px 8px;border-radius:999px;border:2px solid var(--ink);
+    align-self:flex-start;
+  }
+  .bi-status.urgent{background:var(--coral);color:#fff;border-color:var(--coral)}
+  .bi-status.warn{background:var(--sun);color:var(--ink);border-color:var(--sun)}
+  .bi-status.ok{background:#e1f5ee;color:#0f6e56;border-color:#0f6e56}
+
+  .moon-tracker{
+    background:linear-gradient(135deg, #0a1424 0%, #0e1d36 100%);
+    border:3px solid var(--ink);border-radius:18px;padding:20px;
+    box-shadow:6px 6px 0 rgba(29,42,58,0.25);
+  }
+  .moon-tracker .book-eyebrow{color:#caf0f8}
+  .moon-subtitle{font-size:12px;color:rgba(255,255,255,0.6);margin:0 0 16px;font-family:"Space Mono",monospace;font-size:10px;letter-spacing:0.08em}
+  .moon-row{display:grid;grid-template-columns:repeat(9,1fr);gap:6px;margin-bottom:12px}
+  .moon-cell{
+    display:flex;flex-direction:column;align-items:center;gap:4px;
+    padding:8px 4px;border-radius:10px;border:2px solid rgba(255,255,255,0.12);
+    transition:border-color 0.2s;
+  }
+  .moon-cell.peak{border-color:var(--sun);background:rgba(255,201,60,0.08)}
+  .moon-cell .m-icon{font-size:20px;line-height:1}
+  .moon-cell .m-date{font-family:"Space Mono",monospace;font-size:8px;color:rgba(255,255,255,0.5);letter-spacing:0.06em;font-weight:700}
+  .moon-cell .m-day{font-size:9px;color:rgba(255,255,255,0.4);font-weight:500}
+  .moon-cell.peak .m-date{color:var(--sun)}
+  .moon-note{font-family:"Space Mono",monospace;font-size:10px;color:rgba(255,255,255,0.55);letter-spacing:0.06em;margin:0}
+  .moon-note b{color:var(--sun)}
+
+  /* ====== END book grid ====== */
+  .below{
+    position:relative;
+    z-index:0;
+    isolation:isolate;
+    background:linear-gradient(180deg, #48cae4 0%, #90e0ef 60%, #caf0f8 100%);
+    padding:80px 40px 60px;
+  }
+  /* decorative wave squiggles in background */
+  .below::before{
+    content:"";position:absolute;inset:0;pointer-events:none;
+    background-image:
+      radial-gradient(circle at 5% 10%, rgba(255,255,255,0.5) 1px, transparent 2px),
+      radial-gradient(circle at 95% 30%, rgba(255,255,255,0.5) 1px, transparent 2px),
+      radial-gradient(circle at 20% 80%, rgba(255,255,255,0.5) 1px, transparent 2px);
+    background-size:240px 240px;opacity:0.4;
+  }
+  .below-inner{max-width:1480px;margin:0 auto;position:relative;z-index:1}
+  .section-label{
+    font-family:"Space Mono",monospace;font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:var(--ink);font-weight:700;
+    margin-bottom:8px;display:inline-flex;align-items:center;gap:10px;
+    background:var(--sun);padding:8px 16px;border:2.5px solid var(--ink);border-radius:999px;
+    box-shadow:3px 3px 0 rgba(29,42,58,0.25);transform:rotate(-1deg);
+  }
+  .section-title{
+    font-family:"Bagel Fat One",cursive;font-size:clamp(48px,7vw,84px);font-weight:400;line-height:0.95;
+    margin:14px 0 32px;letter-spacing:0.005em;color:var(--coral);
+    text-shadow:4px 4px 0 var(--sun), 8px 8px 0 rgba(29,42,58,0.25);
+  }
+  .section-title em{font-style:normal;color:#fff;text-shadow:4px 4px 0 var(--sea-deep), 8px 8px 0 rgba(29,42,58,0.25);}
+
+  /* atlas map */
+  .atlas-wrap{
+    border:1px solid var(--rule);border-radius:14px;overflow:hidden;
+    background: radial-gradient(1200px 800px at 50% 50%, rgba(20,40,56,0.6), transparent 70%), #0a1925;
+    position:relative;margin-bottom:80px;
+  }
+  .atlas-wrap svg{display:block;width:100%;height:auto}
+  .atlas-overlay-tl{position:absolute;top:18px;left:20px;font-family:"JetBrains Mono",monospace;font-size:10px;color:var(--ink-3);letter-spacing:0.18em;text-transform:uppercase}
+  .atlas-overlay-tr{position:absolute;top:18px;right:20px;font-family:"JetBrains Mono",monospace;font-size:10px;color:var(--ink-3);letter-spacing:0.18em;text-transform:uppercase;text-align:right;line-height:1.7}
+  .legend{display:flex;gap:18px;flex-wrap:wrap;padding:14px 20px;border-top:1px solid var(--rule);
+    font-family:"JetBrains Mono",monospace;font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:var(--ink-3)}
+  .legend .item{display:flex;align-items:center;gap:8px}
+  .legend .swatch{width:10px;height:10px;border-radius:50%}
+
+  /* stats banner - playful pills */
+  .banner{
+    display:grid;grid-template-columns:repeat(4,1fr);gap:20px;
+    padding:30px 0;margin-bottom:60px;
+  }
+  @media (max-width:900px){.banner{grid-template-columns:repeat(2,1fr)}}
+  .bcell{
+    background:#fff;border:3px solid var(--ink);border-radius:18px;padding:18px 20px;
+    box-shadow:5px 5px 0 rgba(29,42,58,0.25);
+  }
+  .bcell:nth-child(1){transform:rotate(-1deg);background:var(--sun)}
+  .bcell:nth-child(2){transform:rotate(0.7deg);background:var(--coral);color:#fff}
+  .bcell:nth-child(3){transform:rotate(-0.5deg);background:var(--palm);color:#fff}
+  .bcell:nth-child(4){transform:rotate(1deg);background:var(--pink);color:#fff}
+  .bcell .k{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:0.16em;text-transform:uppercase;font-weight:700;margin-bottom:6px;opacity:0.9}
+  .bcell .v{font-family:"Bagel Fat One",cursive;font-size:32px;color:inherit;letter-spacing:0.005em;line-height:1;margin-bottom:8px}
+  .bcell .v em{font-style:normal;color:var(--ink);-webkit-text-stroke:0}
+  .bcell:nth-child(2) .v em,.bcell:nth-child(3) .v em,.bcell:nth-child(4) .v em{color:var(--sun)}
+  .bcell .s{font-size:13px;line-height:1.45;font-weight:500;opacity:0.95}
+
+  /* lists - postcards */
+  .tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px}
+  .tile{
+    border:3px solid var(--ink);border-radius:18px;padding:22px;
+    background:#fff;display:flex;flex-direction:column;gap:14px;
+    box-shadow:6px 6px 0 rgba(29,42,58,0.25);
+  }
+  .tile:nth-child(4n+1){transform:rotate(-0.8deg);background:#fffdf3}
+  .tile:nth-child(4n+2){transform:rotate(0.6deg);background:#fff8e1}
+  .tile:nth-child(4n+3){transform:rotate(-0.4deg);background:#fff3e0}
+  .tile:nth-child(4n+4){transform:rotate(0.9deg);background:#ffeef2}
+  .tile .cat{
+    font-family:"Space Mono",monospace;font-size:10px;letter-spacing:0.16em;text-transform:uppercase;
+    color:#fff;background:var(--coral);padding:5px 12px;border-radius:999px;border:2px solid var(--ink);
+    align-self:flex-start;font-weight:700;
+  }
+  .tile:nth-child(4n+2) .cat{background:var(--palm)}
+  .tile:nth-child(4n+3) .cat{background:var(--sea-deep)}
+  .tile:nth-child(4n+4) .cat{background:var(--pink)}
+  .tile h3{font-family:"Bagel Fat One",cursive;font-weight:400;font-size:30px;margin:0;line-height:0.95;color:var(--ink);letter-spacing:0.005em}
+  .tile h3 em{font-style:normal;color:var(--coral)}
+  .tile:nth-child(4n+2) h3 em{color:var(--palm)}
+  .tile:nth-child(4n+3) h3 em{color:var(--sea-deep)}
+  .tile:nth-child(4n+4) h3 em{color:var(--pink)}
+  .tile ol{margin:0;padding:0;list-style:none;counter-reset:f;display:flex;flex-direction:column;gap:10px}
+  .tile ol li{counter-increment:f;display:flex;align-items:baseline;gap:10px;font-size:13px;color:var(--ink);line-height:1.45;font-weight:500;min-width:0;white-space:nowrap;overflow:hidden}
+  .tile ol li::before{
+    content:counter(f,decimal-leading-zero);
+    font-family:"Bagel Fat One",cursive;font-size:14px;color:var(--coral);flex-shrink:0;
+  }
+  .tile:nth-child(4n+2) ol li::before{color:var(--palm)}
+  .tile:nth-child(4n+3) ol li::before{color:var(--sea-deep)}
+  .tile:nth-child(4n+4) ol li::before{color:var(--pink)}
+  .tile ol li b{color:var(--ink);font-weight:700;flex-shrink:0}
+  .tile ol li .sub{color:var(--ink-2);font-size:13px;font-weight:400;min-width:0;overflow:hidden;text-overflow:ellipsis}
+  .tile ol li .sub::before{content:" — ";color:var(--ink-3);margin:0 2px}
+
+  /* ============ quick guides toolkit ============ */
+  .toolkit{margin-bottom:50px}
+  .toolkit-label{
+    font-family:"Space Mono",monospace;font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:var(--ink);font-weight:700;
+    margin-bottom:14px;display:inline-flex;align-items:center;gap:10px;
+    background:var(--pink);color:#fff;padding:8px 16px;border:2.5px solid var(--ink);border-radius:999px;
+    box-shadow:3px 3px 0 rgba(29,42,58,0.25);transform:rotate(-0.8deg);
+  }
+  .toolkit-title{
+    font-family:"Bagel Fat One",cursive;font-size:clamp(36px,5vw,56px);font-weight:400;line-height:0.95;
+    margin:12px 0 24px;letter-spacing:0.005em;color:var(--coral);
+    text-shadow:3px 3px 0 var(--sun), 6px 6px 0 rgba(29,42,58,0.2);
+  }
+  .toolkit-title em{font-style:normal;color:#fff;text-shadow:3px 3px 0 var(--sea-deep), 6px 6px 0 rgba(29,42,58,0.2);}
+  .toolkit-buttons{
+    display:grid;grid-template-columns:repeat(auto-fit, minmax(160px, 1fr));gap:14px;
+  }
+  .tk-btn{
+    border:3px solid var(--ink);border-radius:18px;
+    padding:18px 16px;cursor:pointer;font-family:"Fredoka",sans-serif;
+    display:flex;flex-direction:column;align-items:center;gap:8px;
+    box-shadow:5px 5px 0 rgba(29,42,58,0.3);transition:transform 0.15s, box-shadow 0.15s;
+    background:#fff;color:var(--ink);text-align:center;
+  }
+  .tk-btn:hover{transform:translate(-3px,-3px);box-shadow:8px 8px 0 rgba(29,42,58,0.3)}
+  .tk-btn:active{transform:translate(1px,1px);box-shadow:3px 3px 0 rgba(29,42,58,0.3)}
+  .tk-btn .icon{font-size:38px;line-height:1}
+  .tk-btn .label{font-family:"Bagel Fat One",cursive;font-size:18px;letter-spacing:0.005em;line-height:1}
+  .tk-btn .sub{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;font-weight:700;color:var(--ink-2)}
+  .tk-btn.c-coral{background:var(--coral);color:#fff;transform:rotate(-1deg)}
+  .tk-btn.c-sun{background:var(--sun);color:var(--ink);transform:rotate(0.8deg)}
+  .tk-btn.c-palm{background:var(--palm);color:#fff;transform:rotate(-0.6deg)}
+  .tk-btn.c-pink{background:var(--pink);color:#fff;transform:rotate(0.5deg)}
+  .tk-btn.c-sea{background:var(--sea-deep);color:#fff;transform:rotate(-0.7deg)}
+  .tk-btn.c-violet{background:#6a4c93;color:#fff;transform:rotate(1deg)}
+  .tk-btn.c-leaf{background:var(--leaf);color:var(--ink);transform:rotate(-0.4deg)}
+  .tk-btn.c-coral .sub,.tk-btn.c-palm .sub,.tk-btn.c-pink .sub,
+  .tk-btn.c-sea .sub,.tk-btn.c-violet .sub{color:rgba(255,255,255,0.85)}
+
+  /* ============ modal ============ */
+  .modal-backdrop{
+    position:fixed;inset:0;z-index:200;background:rgba(0,30,60,0.7);
+    display:none;align-items:flex-start;justify-content:center;
+    overflow-y:auto;padding:40px 20px;
+  }
+  .modal-backdrop.open{display:flex}
+  .modal{
+    background:var(--paper-2);max-width:880px;width:100%;
+    border:3.5px solid var(--ink);border-radius:22px;
+    box-shadow:10px 10px 0 rgba(29,42,58,0.4);
+    position:relative;animation:popIn 0.3s cubic-bezier(.34,1.56,.64,1) both;
+    margin:auto;
+  }
+  @keyframes popIn{
+    from{transform:scale(0.92) translateY(20px);opacity:0}
+    to{transform:scale(1) translateY(0);opacity:1}
+  }
+  .modal-close{
+    position:absolute;top:-18px;right:-18px;width:48px;height:48px;border-radius:50%;
+    border:3px solid var(--ink);background:var(--coral);color:#fff;
+    font-family:"Bagel Fat One",cursive;font-size:24px;cursor:pointer;
+    box-shadow:4px 4px 0 rgba(29,42,58,0.4);transition:transform 0.15s;
+    display:flex;align-items:center;justify-content:center;line-height:1;
+  }
+  .modal-close:hover{transform:rotate(90deg) scale(1.05)}
+  .modal-body{padding:36px 36px 32px}
+  .modal-eyebrow{
+    font-family:"Space Mono",monospace;font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:#fff;font-weight:700;
+    background:var(--sea-deep);padding:8px 16px;border:2.5px solid var(--ink);border-radius:999px;
+    box-shadow:3px 3px 0 rgba(29,42,58,0.25);display:inline-flex;align-items:center;gap:10px;
+    transform:rotate(-1deg);
+  }
+  .modal-title{
+    font-family:"Bagel Fat One",cursive;font-size:clamp(42px,6vw,72px);font-weight:400;line-height:0.95;
+    margin:16px 0 8px;letter-spacing:0.005em;color:var(--coral);
+    text-shadow:3px 3px 0 var(--sun), 6px 6px 0 rgba(29,42,58,0.2);
+  }
+  .modal-intro{font-size:16px;color:var(--ink);line-height:1.5;font-weight:500;margin:0 0 24px;max-width:680px}
+  .modal-section{margin-bottom:24px}
+  .modal-section h4{
+    font-family:"Bagel Fat One",cursive;font-weight:400;font-size:24px;margin:0 0 12px;line-height:1;
+    color:var(--ink);letter-spacing:0.005em;
+    display:inline-flex;align-items:center;gap:10px;
+    background:var(--sun);padding:6px 14px;border:2.5px solid var(--ink);border-radius:10px;
+    box-shadow:3px 3px 0 rgba(29,42,58,0.2);transform:rotate(-0.5deg);
+  }
+  .modal-section h4 .ic{font-size:22px}
+  .modal-list{display:grid;grid-template-columns:1fr;gap:8px;margin-top:14px}
+  @media(min-width:640px){.modal-list{grid-template-columns:1fr 1fr}}
+  .ml-item{
+    background:#fff;border:2.5px solid var(--ink);border-radius:12px;padding:12px 14px;
+    box-shadow:3px 3px 0 rgba(29,42,58,0.18);
+    display:flex;flex-direction:column;gap:4px;
+  }
+  .ml-item .top{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+  .ml-item .name{font-family:"Bagel Fat One",cursive;font-size:17px;color:var(--ink);letter-spacing:0;line-height:1}
+  .ml-item .price{font-family:"Space Mono",monospace;font-size:11px;color:var(--coral);font-weight:700;letter-spacing:0.04em;white-space:nowrap}
+  .ml-item .where{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--sea-deep);font-weight:700}
+  .ml-item .note{font-size:13px;color:var(--ink-2);line-height:1.4;font-weight:500;margin-top:2px}
+  .ml-tips{display:flex;flex-direction:column;gap:6px;margin-top:12px}
+  .ml-tip{
+    display:flex;align-items:flex-start;gap:10px;padding:10px 12px;
+    background:#fff;border:2px solid var(--ink);border-radius:10px;box-shadow:2px 2px 0 rgba(29,42,58,0.15);
+    font-size:13px;color:var(--ink);line-height:1.4;font-weight:500;
+  }
+  .ml-tip .dot{flex-shrink:0;width:18px;height:18px;border-radius:50%;background:var(--coral);color:#fff;
+    display:flex;align-items:center;justify-content:center;font-family:"Bagel Fat One",cursive;font-size:11px;line-height:1;}
+  .ml-tip b{color:var(--sea-deep);font-weight:700}
+  .ml-tip.warn .dot{background:var(--volcano)}
+  .ml-tip.warn b{color:var(--volcano)}
+  .ml-check{
+    display:flex;align-items:flex-start;gap:12px;padding:10px 14px;cursor:pointer;user-select:none;
+    background:#fff;border:2.5px solid var(--ink);border-radius:10px;box-shadow:2px 2px 0 rgba(29,42,58,0.15);
+    font-size:13px;color:var(--ink);line-height:1.4;font-weight:500;transition:transform 0.12s;
+  }
+  .ml-check:hover{transform:translate(-1px,-1px);box-shadow:3px 3px 0 rgba(29,42,58,0.18)}
+  .ml-check input{position:absolute;opacity:0;pointer-events:none}
+  .ml-check .box{
+    flex-shrink:0;width:22px;height:22px;border-radius:6px;border:2.5px solid var(--ink);background:#fff;
+    display:flex;align-items:center;justify-content:center;font-family:"Bagel Fat One",cursive;color:#fff;font-size:16px;line-height:1;
+    transition:background 0.15s, transform 0.15s;
+  }
+  .ml-check input:checked + .box{background:var(--palm);transform:scale(1.05)}
+  .ml-check input:checked + .box::after{content:"✓"}
+  .ml-check .txt b{color:var(--sea-deep);font-weight:700}
+  .ml-check input:checked ~ .txt{text-decoration:line-through;opacity:0.5}
+  .ml-check.warn .box{border-color:var(--volcano)}
+  .ml-check.warn .txt b{color:var(--volcano)}
+  .ml-check input:checked.warn + .box{background:var(--volcano)}
+  .pack-foot{
+    display:flex;justify-content:space-between;align-items:center;
+    margin-top:18px;padding:14px 16px;
+    background:var(--paper);border:2.5px solid var(--ink);border-radius:12px;
+    font-family:"Space Mono",monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;font-weight:700;color:var(--ink);
+  }
+  .pack-foot b{font-family:"Bagel Fat One",cursive;color:var(--coral);font-size:18px;letter-spacing:0;text-transform:none;margin-right:4px}
+  .pack-foot button{
+    border:2px solid var(--ink);background:#fff;color:var(--ink);
+    font-family:"Space Mono",monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;font-weight:700;
+    padding:6px 10px;border-radius:8px;cursor:pointer;
+  }
+  .pack-foot button:hover{background:var(--coral);color:#fff;border-color:var(--coral)}
+  @media(max-width:640px){
+    .modal{margin:20px auto;max-width:calc(100% - 20px)}
+    .modal-close{top:-14px;right:-14px;width:42px;height:42px;font-size:20px}
+    .modal-body{padding:28px 22px 24px}
+  }
+  /* ============ journey ============ */
+  .section-intro{font-size:16px;color:var(--ink);max-width:720px;margin:-20px 0 28px;line-height:1.55;font-weight:500}
+  .section-intro b{color:var(--coral);font-weight:700}
+
+  .day-tabs{display:flex;gap:10px;margin-bottom:28px;flex-wrap:wrap}
+  .day-tab{
+    border:2.5px solid var(--ink);background:#fff;color:var(--ink);
+    padding:8px 14px;border-radius:14px;cursor:pointer;
+    font-family:"Space Mono",monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;font-weight:700;
+    display:flex;align-items:center;gap:10px;min-width:0;
+    box-shadow:3px 3px 0 rgba(29,42,58,0.25);transition:transform 0.15s;
+  }
+  .day-tab .num{font-family:"Bagel Fat One",cursive;font-size:24px;color:var(--coral);letter-spacing:0;text-transform:none;line-height:0.9}
+  .day-tab:hover{transform:translate(-2px,-2px);box-shadow:5px 5px 0 rgba(29,42,58,0.25)}
+  .day-tab.active{background:var(--sun)}
+  .day-tab.active .num{color:var(--ink);text-shadow:2px 2px 0 var(--coral)}
+
+  .journey-grid{display:grid;grid-template-columns:1.45fr 1fr;gap:28px;margin-bottom:60px}
+  @media(max-width:1000px){.journey-grid{grid-template-columns:1fr}}
+
+  .journey-map{
+    border:3px solid var(--ink);border-radius:18px;overflow:hidden;
+    background:linear-gradient(180deg, #00b4d8 0%, #0096c7 100%);
+    position:relative;display:flex;flex-direction:column;
+    box-shadow:6px 6px 0 rgba(29,42,58,0.3);
+  }
+  .journey-map svg{display:block;width:100%;height:auto;flex:1}
+  .journey-controls{
+    display:flex;align-items:center;gap:10px;padding:14px 18px;border-top:3px solid var(--ink);
+    background:#fff;
+  }
+  .j-btn{
+    border:2.5px solid var(--ink);background:#fff;color:var(--ink);
+    font-family:"Space Mono",monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;
+    padding:9px 14px;border-radius:10px;cursor:pointer;font-weight:700;white-space:nowrap;
+    box-shadow:3px 3px 0 rgba(29,42,58,0.25);transition:transform 0.15s;
+  }
+  .j-btn:hover{transform:translate(-2px,-2px);box-shadow:5px 5px 0 rgba(29,42,58,0.25)}
+  .j-btn:disabled{opacity:0.4;cursor:not-allowed;transform:none;box-shadow:3px 3px 0 rgba(29,42,58,0.25)}
+  .j-btn.primary{background:var(--coral);color:#fff}
+  .j-progress{flex:1;display:flex;gap:5px;min-width:60px}
+  .j-prog-seg{flex:1;height:8px;background:rgba(29,42,58,0.12);border-radius:4px;border:1.5px solid var(--ink);transition:background 0.3s}
+  .j-prog-seg.done{background:var(--palm)}
+  .j-prog-seg.cur{background:var(--sun)}
+
+  .journey-panel{display:flex;flex-direction:column;gap:16px;min-width:0}
+  .stop-hero{
+    position:relative;border:3px solid var(--ink);border-radius:18px;overflow:hidden;
+    aspect-ratio:4/3;background:#fff;box-shadow:6px 6px 0 rgba(29,42,58,0.3);
+    transform:rotate(0.6deg);
+  }
+  .stop-fallback{position:absolute;inset:0}
+  .stop-poster{
+    position:absolute;inset:0;z-index:1;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    text-align:center;padding:24px;pointer-events:none;
+  }
+  .stop-poster .pi{font-size:72px;line-height:1;margin-bottom:4px;filter:drop-shadow(0 4px 0 rgba(0,0,0,0.3))}
+  .stop-poster .pn{font-family:"Bagel Fat One",cursive;font-size:38px;line-height:0.95;color:#fff;letter-spacing:0.005em;
+    text-shadow:3px 3px 0 var(--coral), 5px 5px 0 rgba(0,0,0,0.3);padding:0 8px}
+  .stop-photo{position:absolute;inset:0;z-index:2;background-size:cover;background-position:center;
+    opacity:0;transition:opacity 0.6s ease, transform 8s ease-out;transform:scale(1.0)}
+  .stop-photo.live{opacity:1;transform:scale(1.06)}
+  .stop-overlay{
+    position:absolute;left:14px;right:14px;bottom:14px;
+    background:var(--sun);color:var(--ink);
+    padding:12px 16px 12px;border-radius:12px;
+    border:2.5px solid var(--ink);box-shadow:3px 3px 0 rgba(29,42,58,0.3);
+    transform:rotate(-1deg);
+  }
+  .stop-num{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--ink);font-weight:700;margin-bottom:2px;opacity:0.85}
+  .stop-num b{color:var(--coral);font-weight:700;font-size:13px}
+  .stop-overlay h3{font-family:"Bagel Fat One",cursive;font-weight:400;font-size:28px;margin:0 0 4px;line-height:0.95;color:var(--ink);letter-spacing:0.005em}
+  .stop-overlay h3 em{font-style:normal;color:var(--coral)}
+  .stop-overlay p{margin:0;font-size:13px;color:var(--ink);line-height:1.4;font-weight:500}
+  .stop-overlay .actions{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+  .stop-overlay .gm-link{
+    display:inline-flex;align-items:center;gap:6px;
+    background:var(--ink);color:#fff;text-decoration:none;
+    padding:5px 10px;border-radius:999px;border:2px solid var(--ink);
+    font-family:"Space Mono",monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;font-weight:700;
+    transition:transform 0.15s;
+  }
+  .stop-overlay .gm-link:hover{transform:translate(-1px,-1px);background:var(--coral);border-color:var(--coral)}
+
+  .stop-list{
+    display:flex;flex-direction:column;gap:4px;
+    border:3px solid var(--ink);border-radius:14px;
+    background:#fff;padding:8px;max-height:340px;overflow-y:auto;
+    box-shadow:5px 5px 0 rgba(29,42,58,0.25);
+  }
+  .stop-list::-webkit-scrollbar{width:6px}
+  .stop-list::-webkit-scrollbar-thumb{background:var(--coral);border-radius:3px}
+  .stop-row{
+    display:grid;grid-template-columns:54px 1fr auto;gap:12px;align-items:center;
+    padding:8px 10px;border-radius:10px;cursor:pointer;transition:background 0.2s;
+    border:2px solid transparent;
+  }
+  .stop-row:hover{background:#fffdf3}
+  .stop-row.active{background:var(--sun);border-color:var(--ink)}
+  .sr-thumb{
+    width:54px;height:42px;border-radius:6px;background-size:cover;background-position:center;
+    position:relative;overflow:hidden;border:2px solid var(--ink);
+  }
+  .sr-thumb .sr-fb{position:absolute;inset:0}
+  .sr-thumb .sr-img{position:absolute;inset:0;background-size:cover;background-position:center;opacity:0;transition:opacity 0.4s}
+  .sr-thumb .sr-img.live{opacity:1}
+  .sr-name{font-size:13px;color:var(--ink);line-height:1.25;min-width:0;font-weight:500}
+  .sr-name b{font-weight:700;font-family:"Fredoka",sans-serif;font-size:14px}
+  .sr-name .sub{display:block;font-size:11px;color:var(--ink-2);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:400}
+  .stop-row.active .sr-name b{color:var(--ink)}
+  .sr-idx{font-family:"Bagel Fat One",cursive;font-size:18px;color:var(--coral);letter-spacing:0;padding-left:4px}
+  .stop-row.active .sr-idx{color:var(--ink)}
+
+  /* car + journey map markers */
+  .car-icon{transition:none}
+  .car-body{fill:var(--coral);stroke:var(--ink);stroke-width:1}
+  .car-window{fill:var(--sea-deep);opacity:0.95}
+  .car-wheel{fill:var(--ink)}
+  .car-light{fill:var(--sun)}
+  .car-shadow{fill:rgba(0,30,60,0.3);filter:blur(2px)}
+
+  .j-route-bg{fill:none;stroke:rgba(255,255,255,0.45);stroke-width:1.6;stroke-dasharray:3 4}
+  .j-route-fg{fill:none;stroke:var(--coral);stroke-width:3;stroke-linecap:round;stroke-linejoin:round;}
+  .j-mk{fill:#fff;stroke:var(--ink);stroke-width:1.2;transition:all 0.3s}
+  .j-mk.done{fill:var(--palm);stroke:var(--ink)}
+  .j-mk.cur{fill:var(--sun);stroke:var(--ink);stroke-width:1.6;r:6.5}
+  .j-mk-label{font-family:"Space Mono",monospace;font-size:10px;font-weight:700;fill:var(--ink);letter-spacing:0.02em;pointer-events:none}
+  .j-mk-label.cur{fill:var(--coral);font-size:11px}
+  .j-pulse{fill:rgba(255,201,60,0.55);animation:jPulse 2.2s ease-out infinite}
+  @keyframes jPulse{0%{r:6;opacity:0.85}100%{r:22;opacity:0}}
+
+  /* ============ day plan ============ */
+  .dp-card{
+    border:3px solid var(--ink);border-radius:18px;background:#fff;
+    margin-bottom:12px;overflow:hidden;
+    box-shadow:5px 5px 0 rgba(29,42,58,0.2);
+  }
+  .dp-header{
+    display:flex;align-items:center;gap:14px;padding:16px 20px;cursor:pointer;
+    background:var(--paper);
+    transition:background 0.2s;user-select:none;
+    -webkit-tap-highlight-color:transparent;
+    border:none;width:100%;text-align:left;font-family:inherit;
+  }
+  .dp-card.open .dp-header{background:var(--sun)}
+  .dp-header:hover{background:var(--sand)}
+  .dp-num{
+    font-family:"Bagel Fat One",cursive;font-size:36px;color:var(--coral);line-height:1;
+    flex-shrink:0;width:44px;text-align:center;
+  }
+  .dp-card.open .dp-num{color:var(--ink)}
+  .dp-hinfo{flex:1;min-width:0}
+  .dp-date{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--ink-2);font-weight:700;margin-bottom:2px}
+  .dp-title{font-family:"Fredoka",sans-serif;font-size:18px;font-weight:600;color:var(--ink);line-height:1.2;margin-bottom:4px}
+  .dp-summary{font-size:13px;color:var(--ink-2);line-height:1.4;font-weight:500}
+  .dp-tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px}
+  .dp-tag{font-size:10px;font-weight:700;font-family:"Space Mono",monospace;letter-spacing:0.08em;
+    padding:3px 8px;border-radius:999px;border:2px solid;text-transform:uppercase;white-space:nowrap}
+  .dp-tag.sunset{background:#FAECE7;color:#993C1D;border-color:#993C1D}
+  .dp-tag.sunrise{background:#FAEEDA;color:#854F0B;border-color:#854F0B}
+  .dp-tag.hike{background:#E1F5EE;color:#0F6E56;border-color:#0F6E56}
+  .dp-tag.stars{background:#EEEDFE;color:#3C3489;border-color:#3C3489}
+  .dp-tag.food{background:#FBEAF0;color:#72243E;border-color:#72243E}
+  .dp-chev{font-size:22px;color:var(--ink-2);flex-shrink:0;transition:transform 0.25s;line-height:1}
+  .dp-card.open .dp-chev{transform:rotate(180deg)}
+  .dp-body{display:none;padding:0 20px 20px;border-top:3px solid var(--ink)}
+  .dp-card.open .dp-body{display:block}
+  .dp-slots{margin-top:16px;display:flex;flex-direction:column;gap:14px}
+  .dp-slot{display:flex;gap:14px;align-items:flex-start}
+  .dp-slot-left{display:flex;flex-direction:column;gap:5px;align-items:flex-start;flex-shrink:0;min-width:90px}
+  .dp-time{
+    font-family:"Space Mono",monospace;font-size:11px;letter-spacing:0.06em;font-weight:700;
+    color:#fff;background:var(--sea-deep);padding:4px 9px;border-radius:8px;
+    white-space:nowrap;text-transform:uppercase;border:2px solid var(--ink);
+    line-height:1.3;
+  }
+  .dp-price{
+    font-family:"Space Mono",monospace;font-size:10px;font-weight:700;letter-spacing:0.04em;
+    padding:3px 8px;border-radius:6px;white-space:nowrap;border:2px solid;line-height:1.3;
+  }
+  .dp-price.free{background:#e1f5ee;color:#0f6e56;border-color:#0f6e56}
+  .dp-price.paid{background:#faece7;color:#993c1d;border-color:#993c1d}
+  .dp-slot-body{font-size:14px;color:var(--ink);line-height:1.55;font-weight:500;padding-top:3px;flex:1;min-width:0}
+  .dp-slot-body strong{color:var(--sea-deep);font-weight:700}
+  .place-link{
+    color:var(--sea-deep);text-decoration:none;border-bottom:2px solid var(--sea-mid);
+    transition:color 0.15s,border-color 0.15s;white-space:nowrap;
+  }
+  .place-link:hover{color:var(--coral);border-color:var(--coral)}
+  .sr-actions{display:flex;align-items:center;gap:8px;flex-shrink:0}
+  .sr-photos{
+    font-size:18px;text-decoration:none;opacity:0.7;transition:opacity 0.15s,transform 0.15s;
+    line-height:1;
+  }
+  .sr-photos:hover{opacity:1;transform:scale(1.2)}
+    font-family:"Space Mono",monospace;font-size:10px;font-weight:700;letter-spacing:0.06em;
+    padding:3px 10px;border-radius:999px;background:var(--ink);color:#fff;
+    border:2px solid var(--ink);white-space:nowrap;
+  }
+
+  /* ============ mobile ============ */
+  @media (max-width:760px){
+    .stop-overlay h3{font-size:22px}
+    .stop-list{max-height:260px}
+    .j-btn{padding:8px 10px;font-size:9px}
+    .below{padding:60px 16px 40px}
+    .topbar{padding:10px 16px}
+    .brand{font-size:22px}
+    .topmeta{display:none}
+    .scene .top-eyebrow{top:60px;left:18px}
+    .scene .top-eyebrow .num{font-size:28px}
+    .scene .center{left:18px;right:18px;top:42%}
+    .scene .center .lede{font-size:15px;margin-top:14px}
+    .scene .map-inset, .scene .supp{display:none}
+    .scene .bottom{left:18px;right:18px;bottom:130px;flex-direction:column;align-items:stretch}
+    .stats{flex-direction:row;align-items:stretch;justify-content:space-between;flex-wrap:wrap}
+    .stat{min-width:0;flex:1}
+    .stat .v{font-size:15px}
+    .scene-arrow{display:none}
+    .filmstrip{padding:10px 12px 12px;gap:8px}
+    .chip{height:54px;flex-basis:80px}
+    /* below sections */
+    .book-grid{grid-template-columns:1fr}
+    .tiles{grid-template-columns:1fr}
+    .banner{grid-template-columns:1fr 1fr}
+    .section-title{font-size:clamp(26px,6vw,42px)}
+    .toolkit-buttons{grid-template-columns:repeat(2,1fr)}
+    .journey-grid{grid-template-columns:1fr}
+    .day-tabs{gap:6px;overflow-x:auto;flex-wrap:nowrap;padding-bottom:4px}
+    .day-tab{padding:6px 10px;flex-shrink:0}
+    .day-tab .num{font-size:18px}
+    .dp-slot{flex-direction:column;gap:6px}
+    .dp-slot-left{flex-direction:row;flex-wrap:wrap;gap:5px;min-width:0}
+    .dp-time{min-width:0}
+    .dp-header{padding:12px 14px;gap:10px}
+    .dp-body{padding:0 14px 16px}
+    .dp-num{font-size:28px;width:36px}
+    .dp-title{font-size:16px}
+    .modal{margin:16px auto;max-width:calc(100% - 16px)}
+    .modal-body{padding:24px 18px 20px}
+    .modal-close{top:-12px;right:-12px;width:38px;height:38px;font-size:18px}
+  }
+  @media (max-width:480px){
+    .banner{grid-template-columns:1fr}
+    .book-item{gap:8px}
+    .bi-status{align-self:flex-start;margin-top:0}
+    .below{padding:50px 12px 40px}
+    .section-title{font-size:24px}
+    .toolkit-buttons{grid-template-columns:1fr 1fr}
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ TOP BAR ============ -->
+<div class="topbar">
+  <div class="brand">Nine days on <em>Tenerife</em></div>
+  <div class="topmeta">
+    <span><span class="dot"></span>NEW MOON · SEP 11</span>
+    <span>SEP 05 → 13, 2026</span>
+    <span id="dayCounter">DAY 01 / 09</span>
+  </div>
+</div>
+
+<!-- ============ CINEMA ============ -->
+<div class="cinema" id="cinema">
+
+  <!-- scenes injected -->
+  <div id="scenes"></div>
+
+  <!-- side arrows -->
+  <button class="scene-arrow prev" id="prevBtn" aria-label="Previous">‹</button>
+  <button class="scene-arrow next" id="nextBtn" aria-label="Next">›</button>
+
+  <!-- filmstrip -->
+  <div class="filmstrip">
+    <button class="nav-btn" id="prevBtn2" aria-label="Previous">‹</button>
+    <button class="play-btn" id="playBtn">❚❚ PAUSE</button>
+    <div class="strip" id="strip"></div>
+    <button class="nav-btn" id="nextBtn2" aria-label="Next">›</button>
+  </div>
+</div>
+
+<!-- ============ ATLAS + LISTS ============ -->
+<section class="below">
+  <div class="below-inner">
+
+    <!-- ====== quick guides toolkit ====== -->
+    <div class="toolkit">
+      <div class="toolkit-label">QUICK GUIDES · TAP A TOPIC</div>
+      <h2 class="toolkit-title">Trip <em>toolkit</em>.</h2>
+      <div class="toolkit-buttons" id="toolkitButtons">
+        <button class="tk-btn c-coral" data-guide="restaurants">
+          <span class="icon">🍽</span>
+          <span class="label">Restaurants</span>
+          <span class="sub">By category</span>
+        </button>
+        <button class="tk-btn c-sea" data-guide="tips">
+          <span class="icon">✈</span>
+          <span class="label">Travel tips</span>
+          <span class="sub">Driving · bookings</span>
+        </button>
+        <button class="tk-btn c-palm" data-guide="hikes">
+          <span class="icon">🥾</span>
+          <span class="label">Hikes</span>
+          <span class="sub">By difficulty</span>
+        </button>
+        <button class="tk-btn c-sun" data-guide="sunsets">
+          <span class="icon">🌅</span>
+          <span class="label">Sunsets</span>
+          <span class="sub">Ranked spots</span>
+        </button>
+        <button class="tk-btn c-violet" data-guide="stargazing">
+          <span class="icon">✨</span>
+          <span class="label">Stargazing</span>
+          <span class="sub">Moon · spots · gear</span>
+        </button>
+        <button class="tk-btn c-pink" data-guide="beaches">
+          <span class="icon">🏖</span>
+          <span class="label">Beaches</span>
+          <span class="sub">N · S · wild</span>
+        </button>
+        <button class="tk-btn c-leaf" data-guide="packing">
+          <span class="icon">🎒</span>
+          <span class="label">Packing list</span>
+          <span class="sub">Sea to summit</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="section-label">FIG. 02 — JOURNEY</div>
+    <h2 class="section-title">Day by day, <em>stop by stop</em>.</h2>
+    <p class="section-intro">Pick a day. Watch the car drive the route — or click <b>NEXT STOP</b> to advance manually. Each stop pops up with its own photo and what's there.</p>
+
+    <div class="day-tabs" id="dayTabs"></div>
+
+    <div class="journey-grid">
+      <div class="journey-map">
+        <svg id="journeyMap" viewBox="120 30 700 580" preserveAspectRatio="xMidYMid meet"></svg>
+        <div class="journey-controls">
+          <button class="j-btn" id="jPrev">← PREV STOP</button>
+          <div class="j-progress" id="jProg"></div>
+          <button class="j-btn" id="jAuto">▶ DRIVE</button>
+          <button class="j-btn primary" id="jNext">NEXT STOP →</button>
+        </div>
+      </div>
+
+      <div class="journey-panel">
+        <div class="stop-hero" id="stopHero">
+          <div class="stop-fallback fb-coast" id="stopFallback"></div>
+          <div class="stop-poster">
+            <div class="pi" id="stopIcon">📍</div>
+            <div class="pn" id="stopPoster">—</div>
+          </div>
+          <div class="stop-photo" id="stopPhoto"></div>
+          <div class="stop-overlay">
+            <div class="stop-num">STOP <b id="stopNum">01</b> / <span id="stopTotal">02</span></div>
+            <h3 id="stopName">—</h3>
+            <p id="stopDesc">—</p>
+            <div class="actions"><a id="stopMapLink" class="gm-link" target="_blank" rel="noopener" href="#">↗ Open in Maps</a></div>
+          </div>
+        </div>
+        <div class="stop-list" id="stopList"></div>
+      </div>
+    </div>
+
+    <div class="banner">
+      <div class="bcell">
+        <div class="k">DRIVING · TOTAL</div>
+        <div class="v">≈ <em>410</em> km</div>
+        <div class="s">Two bases — north then south. The TF-1 transfer is 1h15; we do it once.</div>
+      </div>
+      <div class="bcell">
+        <div class="k">ALTITUDE · RANGE</div>
+        <div class="v">0 → <em>3,715</em> m</div>
+        <div class="s">Sea-level harbours up to Pico del Teide via cable car + Telesforo Bravo.</div>
+      </div>
+      <div class="bcell">
+        <div class="k">DARK SKY · NIGHTS</div>
+        <div class="v"><em>4</em> peak</div>
+        <div class="s">Sept 9–12. The new moon on Sept 11 is the darkest night of the year here.</div>
+      </div>
+      <div class="bcell">
+        <div class="k">TEMPS · COAST/ALT</div>
+        <div class="v"><em>26°</em> ↘ 6°</div>
+        <div class="s">Coast 26–28°C, single digits at altitude after dark. Sea ≈ 23°C.</div>
+      </div>
+    </div>
+
+    <!-- ====== Moon Phase + Bookings ====== -->
+    <div class="section-label">FIG. 03 — BOOK FIRST</div>
+    <h2 class="section-title">Don't wait, <em>book now</em>.</h2>
+
+    <div class="book-grid">
+      <div class="book-urgent">
+        <div class="book-eyebrow">⚠️ BOOK IMMEDIATELY</div>
+        <div class="book-items">
+          <div class="book-item">
+            <div class="bi-icon">🏔️</div>
+            <div class="bi-body">
+              <b>Teide summit permit</b>
+              <span>Mondays 7am Canary time · 8 weeks ahead · book via reservasparquesnacionales.es</span>
+            </div>
+            <div class="bi-status urgent">NOW</div>
+          </div>
+          <div class="book-item">
+            <div class="bi-icon">🥾</div>
+            <div class="bi-body">
+              <b>Masca gorge slot</b>
+              <span>caminobarrancodemasca.com · weeks in advance, Wed–Sat only</span>
+            </div>
+            <div class="bi-status urgent">SOON</div>
+          </div>
+          <div class="book-item">
+            <div class="bi-icon">🚡</div>
+            <div class="bi-body">
+              <b>Teide cable car</b>
+              <span>€40 return · book 1–2 weeks ahead · telesforo.com</span>
+            </div>
+            <div class="bi-status warn">1–2 WK</div>
+          </div>
+          <div class="book-item">
+            <div class="bi-icon">✨</div>
+            <div class="bi-body">
+              <b>Stargazing tour</b>
+              <span>Night Skies Tenerife · target Sept 10 or 11 (new moon)</span>
+            </div>
+            <div class="bi-status warn">1–2 WK</div>
+          </div>
+          <div class="book-item">
+            <div class="bi-icon">🍽️</div>
+            <div class="bi-body">
+              <b>La Vieja + El Rincón de Juan Carlos</b>
+              <span>2 Michelin stars; La Vieja sunset terrace fills fast in September</span>
+            </div>
+            <div class="bi-status ok">1 WK</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="moon-tracker">
+        <div class="book-eyebrow">🌙 MOON ACROSS YOUR TRIP</div>
+        <p class="moon-subtitle">Darker = better stargazing · New moon Sept 11 is your peak</p>
+        <div class="moon-row" id="moonRow"></div>
+        <p class="moon-note">Sweet spot: <b>Sept 9–12</b> · Milky Way core visible from Minas de San José</p>
+      </div>
+    </div>
+
+    <!-- ====== DAY-BY-DAY PLAN ====== -->
+    <div class="section-label">FIG. 04 — DAY-BY-DAY PLAN</div>
+    <h2 class="section-title">Every day, <em>hour by hour</em>.</h2>
+    <p class="section-intro">Tap any day to expand the full schedule.</p>
+    <div id="dayPlan"></div>
+
+    <div class="section-label">FIG. 05 — CURATED LISTS</div>
+    <h2 class="section-title">Highlights, <em>by category</em>.</h2>
+
+    <div class="tiles">
+      <div class="tile">
+        <div class="cat">Sunsets · ranked</div>
+        <h3>Where the <em>sun drops</em></h3>
+        <ol>
+          <li><b>Pico del Inglés</b><span class="sub">Anaga · locals' pick, quieter than Cruz del Carmen</span></li>
+          <li><b>Narices del Teide</b><span class="sub">Inside the park · west-facing, often above the clouds</span></li>
+          <li><b>Mirador de Chipeque</b><span class="sub">Pine forest + sea of clouds + Teide</span></li>
+          <li><b>Mirador de Cherfe</b><span class="sub">Teno mountains · few people</span></li>
+          <li><b>Archipenque</b><span class="sub">Los Gigantes · La Gomera & La Palma on clear days</span></li>
+        </ol>
+      </div>
+      <div class="tile">
+        <div class="cat">Stargazing · darkest</div>
+        <h3>Above <em>the inversion</em></h3>
+        <ol>
+          <li><b>Minas de San José</b><span class="sub">The Tenerife "Mars" landscape, 2,000m+</span></li>
+          <li><b>Mirador de la Tarta</b><span class="sub">Clear southern horizon, Milky Way core</span></li>
+          <li><b>Mirador Las Cañadas</b><span class="sub">In-park pullouts away from Parador lights</span></li>
+          <li><b>Guided astronomy tour</b><span class="sub">Book Sept 9–11 · telescopes + laser tour</span></li>
+        </ol>
+      </div>
+      <div class="tile">
+        <div class="cat">Hikes · by difficulty</div>
+        <h3>From <em>misty laurels</em> to crater rim</h3>
+        <ol>
+          <li><b>Sendero de los Sentidos</b><span class="sub">Easy · 1h loop · Cruz del Carmen, Anaga</span></li>
+          <li><b>Roques de García</b><span class="sub">Easy · 3.5km loop · Teide, no permit</span></li>
+          <li><b>Roque de Taborno</b><span class="sub">Moderate · 3–4h · iconic Anaga rock</span></li>
+          <li><b>Alto de Guajara</b><span class="sub">Hard · 5h · second-highest peak, no permit</span></li>
+          <li><b>Telesforo Bravo summit</b><span class="sub">Very hard · permit required · book 8 weeks out</span></li>
+          <li><b>Masca Gorge</b><span class="sub">Hard · Wed–Sat · boots mandatory · verify access</span></li>
+        </ol>
+      </div>
+      <div class="tile">
+        <div class="cat">Food · point at the fish</div>
+        <h3>Harbours & <em>guachinches</em></h3>
+        <ol>
+          <li><b>La Cofradía</b><span class="sub">Puerto de la Cruz · harbour, fire-soul-fish</span></li>
+          <li><b>Cofradía · Punta del Hidalgo</b><span class="sub">No-frills, plastic chairs, real food</span></li>
+          <li><b>Los Abrigos</b><span class="sub">Point at the fish · papas arrugadas + mojos</span></li>
+          <li><b>El Rocás · Tajao</b><span class="sub">Hidden gem · locals pick from the bar</span></li>
+          <li><b>Guachinche El Miradero</b><span class="sub">Year-round · Teide view · conejo en salmorejo</span></li>
+          <li><b>La Vieja · La Caleta</b><span class="sub">Splurge · sunset over La Gomera</span></li>
+        </ol>
+      </div>
+    </div>
+
+    <p style="margin-top:48px;font-family:'Space Mono',monospace;font-size:11px;color:var(--ink);letter-spacing:0.18em;text-transform:uppercase;text-align:center;font-weight:700">
+      Buen viaje · ← → to navigate · space to play
+    </p>
+  </div>
+</section>
+
+<!-- ============ MODAL ============ -->
+<div class="modal-backdrop" id="modalBackdrop" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true">
+    <button class="modal-close" id="modalClose" aria-label="Close">×</button>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<!-- ============ DATA + LOGIC ============ -->
+<script>
+/* ===== STOPS on island (real lat/lon → equirectangular at 28.3°N) ===== */
+// Conversion: x = 460 + (lon + 16.525) * 775,  y = 320 - (lat - 28.295) * 880
+// All coords below match real-world positions on Tenerife.
+const STOPS = {
+  TFS:{x:417,y:544,n:"Tenerife South Airport",   gps:[28.0445,-16.5725],kind:"start"},
+  TFN:{x:603,y:155,n:"Tenerife North Airport",   gps:[28.4827,-16.3415],kind:"start"},
+  PdC:{x:444,y:212,n:"Puerto de la Cruz",         gps:[28.4149,-16.5485]},
+  ORO:{x:461,y:236,n:"La Orotava",               gps:[28.3908,-16.5228]},
+  ANG:{x:726, y:81,n:"Benijo",                   gps:[28.5762,-16.1586],kind:"star"},
+  CdC:{x:607,y:110,n:"Cruz del Carmen",           gps:[28.5415,-16.2637]},
+  TBR:{x:696, y:87,n:"Taborno",                  gps:[28.5701,-16.1731]},
+  PHI:{x:614, y:76,n:"Punta del Hidalgo",         gps:[28.5763,-16.3209]},
+  LAG:{x:617,y:152,n:"La Laguna",                gps:[28.4874,-16.3159]},
+  TAC:{x:548,y:163,n:"Tacoronte",                gps:[28.4727,-16.4232]},
+  ICO:{x:316,y:253,n:"Icod de los Vinos",        gps:[28.3662,-16.7194]},
+  GAR:{x:276,y:251,n:"Garachico",                gps:[28.3727,-16.7628]},
+  CHE:{x:238,y:319,n:"Mirador de Cherfe",        gps:[28.3204,-16.8234]},
+  MAS:{x:219,y:317,n:"Masca",                    gps:[28.3271,-16.8453]},
+  TEN:{x:148,y:278,n:"Punta de Teno",            gps:[28.3461,-16.9093]},
+  LGI:{x:217,y:357,n:"Los Gigantes",             gps:[28.2463,-16.8386]},
+  ALC:{x:219,y:397,n:"Alcalá",                   gps:[28.2052,-16.8033]},
+  VIL:{x:370,y:442,n:"Vilaflor",                 gps:[28.1573,-16.6378]},
+  TEI:{x:369,y:340,n:"Teide",                    gps:[28.2723,-16.6423],kind:"summit"},
+  ROQ:{x:380,y:377,n:"Roques de García",          gps:[28.2278,-16.6268]},
+  CHI:{x:487,y:228,n:"Mirador Chipeque",          gps:[28.3908,-16.4274],kind:"star"},
+  MNJ:{x:417,y:368,n:"Minas de San José",        gps:[28.2164,-16.6591],kind:"star"},
+  ADE:{x:278,y:471,n:"La Caleta de Adeje",        gps:[28.1097,-16.7783]},
+  MED:{x:452,y:546,n:"El Médano",                gps:[28.0471,-16.5373]},
+  ABR:{x:455,y:540,n:"Los Abrigos",              gps:[28.0082,-16.5149]},
+};
+
+/* ===== Coastline anchors (clockwise from Punta de Anaga) =====
+   Drawn from real-world coastal towns/headlands of Tenerife. */
+const COAST = [
+  [771, 65], [760, 76], [738,100], [727,118], [710,140], [685,168],
+  [660,205], [625,238], [598,258], [580,275], [575,298], [572,320],
+  [555,355], [538,395], [520,430], [495,478], [474,510],
+  [445,540], [455,555], [415,568], [365,578], [336,575],
+  [310,562], [275,510], [248,460], [228,420], [217,388],
+  [212,355], [195,318], [165,290], [148,278],
+  [165,255], [208,250], [255,250], [285,254], [330,243], [386,236],
+  [430,217], [475,200], [510,184], [535,165], [555,150], [575,128],
+  [592, 95], [614, 76], [638, 68], [675, 72], [710, 74], [735, 70], [755, 66],
+];
+
+/* Catmull-Rom → cubic Bezier, closed loop. Produces a smooth coastline. */
+function smoothLoop(pts){
+  const n = pts.length;
+  let d = `M ${pts[0][0]} ${pts[0][1]}`;
+  for(let i=0;i<n;i++){
+    const p0 = pts[(i-1+n)%n], p1 = pts[i], p2 = pts[(i+1)%n], p3 = pts[(i+2)%n];
+    const c1x = p1[0] + (p2[0]-p0[0])/6;
+    const c1y = p1[1] + (p2[1]-p0[1])/6;
+    const c2x = p2[0] - (p3[0]-p1[0])/6;
+    const c2y = p2[1] - (p3[1]-p1[1])/6;
+    d += ` C ${c1x.toFixed(1)} ${c1y.toFixed(1)}, ${c2x.toFixed(1)} ${c2y.toFixed(1)}, ${p2[0]} ${p2[1]}`;
+  }
+  return d + " Z";
+}
+const ISLAND_PATH_NEW = smoothLoop(COAST);
+
+/* ===== Curated real photo URLs — direct Wikimedia Commons files =====
+   All images are public domain / CC-licensed from Wikimedia Commons.
+   Using thumbnail API: https://commons.wikimedia.org/wiki/Special:FilePath/{filename}?width=N
+   These load directly in the browser with no API key needed.
+====================================================================== */
+
+// Wikimedia thumb helper
+const WM = (file, w) => `https://commons.wikimedia.org/wiki/Special:FilePath/${encodeURIComponent(file)}?width=${w}`;
+
+const PHOTO_MAP = {
+  // key → {h: hero-file, t: thumb-file, p: panel-file}  (chip reuses thumb at smaller width)
+  TFS: {
+    h:"Aerial_view_of_Tenerife_Island.jpg",
+    t:"Tenerife_seen_from_the_air.jpg",
+    p:"Costa_Adeje_Tenerife.jpg"
+  },
+  TFN: {
+    h:"Aerial_view_of_Tenerife_Island.jpg",
+    t:"Tenerife_seen_from_the_air.jpg",
+    p:"Costa_Adeje_Tenerife.jpg"
+  },
+  PdC: {
+    h:"Puerto_de_la_Cruz_overview.jpg",
+    t:"Puerto_de_la_Cruz_harbour.jpg",
+    p:"Puerto_de_la_Cruz_-_panoramio.jpg"
+  },
+  ORO: {
+    h:"La_Orotava_Tenerife.jpg",
+    t:"La_Orotava_01.jpg",
+    p:"La_Orotava_-_panoramio.jpg"
+  },
+  ANG: {
+    h:"Playa_de_Benijo_(Parque_Rural_de_Anaga_-_Reserva_de_la_Biosfera_Macizo_de_Anaga)_17.jpg",
+    t:"Benijo_beach_Tenerife.jpg",
+    p:"Playa_Benijo_Tenerife.jpg"
+  },
+  CdC: {
+    h:"Anaga_laurisilva_Tenerife.jpg",
+    t:"Laurisilva_Anaga_Tenerife.jpg",
+    p:"Sendero_Anaga_Tenerife.jpg"
+  },
+  TBR: {
+    h:"Roque_de_Taborno_Anaga_Tenerife.jpg",
+    t:"Taborno_Tenerife_Anaga.jpg",
+    p:"Anaga_mountains_Tenerife.jpg"
+  },
+  PHI: {
+    h:"Punta_del_Hidalgo_Tenerife.jpg",
+    t:"Punta_Hidalgo_coast_Tenerife.jpg",
+    p:"Tenerife_north_coast_village.jpg"
+  },
+  LAG: {
+    h:"San_Cristóbal_de_La_Laguna_-_Plaza_del_Adelantado.jpg",
+    t:"La_Laguna_Tenerife_historic.jpg",
+    p:"La_Laguna_casco_historico.jpg"
+  },
+  TAC: {
+    h:"Vino_de_Tacoronte_Acentejo.jpg",
+    t:"Vineyard_Tenerife_Canary.jpg",
+    p:"Bodega_canaria_Tenerife.jpg"
+  },
+  ICO: {
+    h:"Drago_Milenario_Icod_de_los_Vinos.jpg",
+    t:"Drago_milenario_Icod.jpg",
+    p:"Dragon_tree_Tenerife.jpg"
+  },
+  GAR: {
+    h:"El_Caletón_Garachico_Tenerife.jpg",
+    t:"Garachico_lava_pools_Tenerife.jpg",
+    p:"Garachico_Tenerife_pools.jpg"
+  },
+  CHE: {
+    h:"Mirador_de_Cherfe_Tenerife.jpg",
+    t:"Teno_mountains_Tenerife_sunset.jpg",
+    p:"Tenerife_mountains_sunset.jpg"
+  },
+  MAS: {
+    h:"Masca_Tenerife_village.jpg",
+    t:"Masca_gorge_Tenerife.jpg",
+    p:"Barranco_de_Masca_Tenerife.jpg"
+  },
+  TEN: {
+    h:"Punta_de_Teno_Tenerife.jpg",
+    t:"Teno_lighthouse_Tenerife.jpg",
+    p:"Punta_Teno_cliffs_Tenerife.jpg"
+  },
+  LGI: {
+    h:"Los_Gigantes_Tenerife_cliffs.jpg",
+    t:"Cliffs_of_Los_Gigantes_Tenerife.jpg",
+    p:"Los_Gigantes_sunset_Tenerife.jpg"
+  },
+  ALC: {
+    h:"Alcalá_Tenerife_coast.jpg",
+    t:"Tenerife_south_coast_village.jpg",
+    p:"Tenerife_coastline_village.jpg"
+  },
+  VIL: {
+    h:"Vilaflor_Tenerife_pine_forest.jpg",
+    t:"Vilaflor_village_Tenerife.jpg",
+    p:"Tenerife_pine_forest_dark.jpg"
+  },
+  TEI: {
+    h:"Teide_from_above_clouds.jpg",
+    t:"Teide_volcano_Tenerife.jpg",
+    p:"Pico_del_Teide_summit_Tenerife.jpg"
+  },
+  ROQ: {
+    h:"Roques_de_García_Teide_Tenerife.jpg",
+    t:"Roque_Cinchado_Teide_Tenerife.jpg",
+    p:"Roques_Garcia_Tenerife_landscape.jpg"
+  },
+  CHI: {
+    h:"Mar_de_nubes_Teide_Tenerife.jpg",
+    t:"Teide_sea_of_clouds_Tenerife.jpg",
+    p:"Mirador_Chipeque_Tenerife.jpg"
+  },
+  MNJ: {
+    h:"Milky_Way_Teide_Tenerife_night.jpg",
+    t:"Stargazing_Teide_Tenerife.jpg",
+    p:"Minas_San_Jose_Teide_landscape.jpg"
+  },
+  ADE: {
+    h:"La_Caleta_de_Adeje_Tenerife_sunset.jpg",
+    t:"Tenerife_south_coast_sunset.jpg",
+    p:"Costa_Adeje_coast_Tenerife.jpg"
+  },
+  MED: {
+    h:"El_Médano_Tenerife_beach_Montana_Roja.jpg",
+    t:"El_Medano_beach_Tenerife.jpg",
+    p:"Montana_Roja_El_Medano_Tenerife.jpg"
+  },
+  ABR: {
+    h:"Los_Abrigos_Tenerife_harbour.jpg",
+    t:"Tenerife_fishing_harbour.jpg",
+    p:"Los_Abrigos_fishing_village_Tenerife.jpg"
+  },
+};
+
+// Reliable fallback images by theme (direct stable URLs)
+const FALLBACK_THEMES = {
+  "fb-coast":   "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Tenerife_Benijo_sunset.jpg/1280px-Tenerife_Benijo_sunset.jpg",
+  "fb-anaga":   "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a1/Anaga_Tenerife_laurel_forest.jpg/1280px-Anaga_Tenerife_laurel_forest.jpg",
+  "fb-laguna":  "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/La_Laguna_Tenerife.jpg/1280px-La_Laguna_Tenerife.jpg",
+  "fb-garachico":"https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/El_Caletón_de_Garachico.jpg/1280px-El_Caletón_de_Garachico.jpg",
+  "fb-teide":   "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d8/Teide_desde_el_Teide.jpg/1280px-Teide_desde_el_Teide.jpg",
+  "fb-stargaze":"https://upload.wikimedia.org/wikipedia/commons/thumb/b/b9/Milky_Way_Arch_over_Teide.jpg/1280px-Milky_Way_Arch_over_Teide.jpg",
+  "fb-summit":  "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c4/Pico_del_Teide_summit.jpg/1280px-Pico_del_Teide_summit.jpg",
+  "fb-depart":  "https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/El_Medano_Tenerife.jpg/1280px-El_Medano_Tenerife.jpg",
+};
+
+function getPhotoUrl(key, size='hero'){
+  const entry = PHOTO_MAP[key];
+  if(!entry) return null;
+  // Pick which file based on size
+  let file, width;
+  if(size === 'hero')        { file = entry.h; width = 1600; }
+  else if(size === 'thumb')  { file = entry.t || entry.h; width = 600; }
+  else if(size === 'chip')   { file = entry.t || entry.h; width = 240; }
+  else                        { file = entry.p || entry.h; width = 800; }
+  // Use Wikimedia Special:FilePath which redirects to the actual file
+  return `https://commons.wikimedia.org/wiki/Special:FilePath/${encodeURIComponent(file)}?width=${width}`;
+}
+
+/* ===== Per-stop info: image query + short activity + iconic emoji ===== */
+const STOP_INFO = {
+  TFS:{img:"tenerife,south,airport,canary", desc:"Tenerife South — collect the rental car", icon:"✈️"},
+  TFN:{img:"tenerife,north,airport", desc:"Tenerife North airport", icon:"✈️"},
+  PdC:{img:"puerto-de-la-cruz,tenerife,harbour,plaza", desc:"Harbour walk, sunset on Plaza del Charco, La Cofradía dinner", icon:"⚓"},
+  ORO:{img:"la-orotava,tenerife,oldtown,balconies", desc:"Old-town balconies, pintxos in the evening", icon:"🏘️"},
+  ANG:{img:"benijo,tenerife,beach,sunset,blacksand", desc:"Black-sand beach, low-tide sunset rocks", icon:"🏖️"},
+  CdC:{img:"laurel-forest,anaga,canary,sendero", desc:"Sendero de los Sentidos · misty laurisilva loop", icon:"🌲"},
+  TBR:{img:"taborno,anaga,roque,tenerife", desc:"Iconic Anaga ridge hike, 3–4 hours from Taborno village", icon:"🪨"},
+  PHI:{img:"punta-del-hidalgo,tenerife,coast,village", desc:"Cofradía de Pescadores — plastic chairs, real fish", icon:"🐟"},
+  LAG:{img:"la-laguna,tenerife,oldtown,unesco", desc:"UNESCO old town · Plaza del Adelantado, Mercado Municipal", icon:"🏛️"},
+  TAC:{img:"tacoronte,tenerife,vineyard,wine", desc:"Guachinche lunch country (call ahead — many seasonal)", icon:"🍇"},
+  ICO:{img:"icod-de-los-vinos,tenerife,dragon-tree", desc:"Drago Milenario · Guachinche El Miradero, Teide views", icon:"🌳"},
+  GAR:{img:"garachico,tenerife,lava-pool,el-caleton", desc:"Swim El Caletón — natural pools in the 1706 lava flow", icon:"🌊"},
+  CHE:{img:"cherfe,mirador,tenerife,sunset,mountains", desc:"Sunset behind the Teno mountains, locals' viewpoint", icon:"🌄"},
+  MAS:{img:"masca,tenerife,village,gorge,cliffs", desc:"Cliff-perched village, head of the famous gorge", icon:"⛰️"},
+  TEN:{img:"punta-de-teno,tenerife,lighthouse,cliffs", desc:"Westernmost point lighthouse, La Palma on clear days", icon:"🗼"},
+  LGI:{img:"los-gigantes,tenerife,cliffs,sea,sunset", desc:"Cliffs of the Giants · sunset sail, dolphins year-round", icon:"🐬"},
+  ALC:{img:"alcala,tenerife,coast,village,promenade", desc:"Quiet coastal town, La Gomera silhouette at dusk", icon:"🏘️"},
+  VIL:{img:"vilaflor,tenerife,pine-forest,village", desc:"Highest village on the island · your stargazing base", icon:"🌲"},
+  TEI:{img:"teide,volcano,summit,tenerife,cablecar", desc:"Cable car to La Rambleta · Telesforo Bravo summit", icon:"🌋"},
+  ROQ:{img:"roques-de-garcia,teide,tenerife,rock", desc:"3.5 km Cinchado-rock loop — no permit needed", icon:"🗿"},
+  CHI:{img:"chipeque,mirador,teide,sea-of-clouds,pines", desc:"Mar de nubes sunset — pines + Teide silhouette", icon:"☁️"},
+  MNJ:{img:"minas-de-san-jose,teide,mars,landscape,stars", desc:"\"Tenerife Mars\" — pristine stargazing pullout", icon:"✨"},
+  ADE:{img:"la-caleta,adeje,tenerife,sunset,fishing", desc:"Fishing-village base · La Vieja for last big dinner", icon:"🏖️"},
+  MED:{img:"el-medano,tenerife,beach,montana-roja,sunrise", desc:"Sunrise · Montaña Roja silhouette, surfer country", icon:"🏄"},
+  ABR:{img:"los-abrigos,tenerife,fishing,harbour", desc:"Point at the fish · papas arrugadas with both mojos", icon:"🐠"},
+};
+
+/* ===== DAYS ===== */
+const DAYS = [
+  {n:1, date:"SAT · SEP 05", base:"NORTH · PUERTO DE LA CRUZ",
+   title:'Arrival · <em>the harbour</em>',
+   lede:"Land at TFS, drive 50 minutes north. A slow first evening on Puerto de la Cruz's harbour, dinner at La Cofradía de Pescadores.",
+   img:["puerto-de-la-cruz,tenerife,harbour","plaza-del-charco,tenerife","canary-islands,harbour"],
+   fb:"fb-coast",
+   wx:"26°C / SEA 23°", alt:"0 m", moon:"Waning gibbous",
+   route:["TFS","PdC"], focus:"PdC",
+   schedule:[
+     {t:"15:00", w:"Land at <b>TFS</b>, collect car, drive north <span class='tag'>50 min</span>"},
+     {t:"18:30", w:"Walk Puerto de la Cruz harbour & <b>Plaza del Charco</b>"},
+     {t:"20:30", w:"Dinner · <b>La Cofradía de Pescadores</b> — fire, soul, fish"},
+   ]},
+  {n:2, date:"SUN · SEP 06", base:"NORTH · ANAGA",
+   title:'Anaga · <em>the laurel ridge</em>',
+   lede:"The misty, prehistoric end of the island. Park early at Cruz del Carmen, hike Roque de Taborno, finish at Benijo as the tide goes out.",
+   img:["anaga,laurel,forest","benijo,beach,tenerife","taborno,tenerife,rock"],
+   fb:"fb-anaga",
+   wx:"22°C RIDGE", alt:"950 m", moon:"Waning gibbous",
+   route:["PdC","CdC","TBR","ANG","PHI"], focus:"ANG",
+   schedule:[
+     {t:"09:00", w:"<b>Sendero de los Sentidos</b> loop · misty laurisilva <span class='tag'>easy 1h</span>"},
+     {t:"11:00", w:"<b>Roque de Taborno</b> hike from Taborno village <span class='tag'>3–4h</span>"},
+     {t:"15:00", w:"Lunch in Taganana · drive coast to <b>Roque de las Bodegas</b>"},
+     {t:"19:30", w:"Sunset · <b>Playa de Benijo</b> if low tide, else <b>Pico del Inglés</b>"},
+     {t:"21:30", w:"Dinner · <b>Cofradía</b> Punta del Hidalgo — plastic chairs, real food"},
+   ]},
+  {n:3, date:"MON · SEP 07", base:"NORTH · ORATAVA VALLEY",
+   title:'La Laguna · <em>wine country</em>',
+   lede:"UNESCO old town in the morning, guachinche lunch in Tacoronte. Call ahead — many close until October.",
+   img:["la-laguna,tenerife,oldtown","tacoronte,vineyard","canary-islands,wine"],
+   fb:"fb-laguna",
+   wx:"25°C INLAND", alt:"550 m", moon:"Last quarter approaching",
+   route:["PdC","LAG","TAC","ICO","ORO"], focus:"LAG",
+   schedule:[
+     {t:"10:00", w:"Wander <b>San Cristóbal de La Laguna</b> · Plaza del Adelantado"},
+     {t:"11:30", w:"<b>Mercado Municipal</b> on Plaza del Cristo"},
+     {t:"13:30", w:"Lunch · <b>Guachinche El Miradero</b> (Icod) — conejo, costillas, house wine in clay jars"},
+     {t:"17:00", w:"<b>Mirador de Humboldt</b> · Orotava valley overlook"},
+     {t:"19:30", w:"Sunset · <b>Mirador Garañona</b>, El Sauzal"},
+     {t:"21:00", w:"Pintxos in La Orotava old town"},
+   ]},
+  {n:4, date:"TUE · SEP 08", base:"NORTH → SOUTH TRANSFER",
+   title:'Garachico · <em>Cherfe shadows</em>',
+   lede:"Swim the lava pools, drive up through Masca, sunset at Cherfe behind the Teno mountains. South to Vilaflor for the night.",
+   img:["garachico,tenerife,lavapool","masca,tenerife,canyon","el-caleton,garachico"],
+   fb:"fb-garachico",
+   wx:"27°C COAST", alt:"1,400 m", moon:"Waning crescent",
+   route:["PdC","GAR","MAS","CHE","VIL"], focus:"GAR",
+   schedule:[
+     {t:"10:00", w:"<b>El Caletón</b> lava pools — swim in the 1706 flow"},
+     {t:"13:00", w:"Grilled fish · any harbour-side spot in Garachico"},
+     {t:"15:30", w:"<b>Mirador de Garachico</b> → drive via Masca village"},
+     {t:"19:30", w:"Sunset · <b>Mirador de Cherfe</b> <span class='tag'>locals</span>"},
+     {t:"21:30", w:"Drive to <b>Vilaflor</b> · stock up before 9pm"},
+   ]},
+  {n:5, date:"WED · SEP 09", base:"SOUTH · VILAFLOR",
+   title:'Teide · <em>first dark sky</em>',
+   lede:"Full day in the park, then your stargazing kickoff. With the waning crescent rising late, the sky is dark all evening.",
+   img:["teide,national-park,tenerife","roques-de-garcia,tenerife","milky-way,teide"],
+   fb:"fb-teide",
+   wx:"18°C / 5°C NIGHT", alt:"3,555 m", moon:"Waning crescent ☾",
+   route:["VIL","ROQ","TEI","MNJ"], focus:"TEI",
+   schedule:[
+     {t:"09:30", w:"<b>Roques de García</b> 3.5 km loop — Cinchado rock <span class='tag'>no permit</span>"},
+     {t:"12:30", w:"Cable car up to <b>La Rambleta</b> · 3,555 m <span class='tag'>book ahead</span>"},
+     {t:"15:00", w:"Free side trails to Fortaleza & Pico Viejo overlooks"},
+     {t:"18:30", w:"<b>Narices del Teide</b> · sunset on the west flank"},
+     {t:"21:00", w:"Drive to TF-21 pullout · Milky Way south <span class='tag'>bring layers</span>"},
+   ]},
+  {n:6, date:"THU · SEP 10", base:"SOUTH · VILAFLOR",
+   title:'Summit · <em>peak darkness</em>',
+   lede:"Permit booked? Telesforo Bravo to the crater rim, 3,715 m. If not, Guajara — second-highest peak, no permit, sweeping summit views.",
+   img:["teide,summit,cablecar","guajara,tenerife,hike","tenerife,observatory,night"],
+   fb:"fb-summit",
+   wx:"15°C SUMMIT / 4°C", alt:"3,715 m", moon:"Thin crescent ☽",
+   route:["VIL","TEI","CHI","MNJ"], focus:"TEI",
+   schedule:[
+     {t:"07:00", w:"Cable car early · <b>Telesforo Bravo</b> summit trail <span class='tag'>permit</span>"},
+     {t:"—", w:"Fallback · <b>Alto de Guajara</b> hike, 5h round-trip"},
+     {t:"19:30", w:"Sunset · <b>Mirador de Chipeque</b> · pine + mar de nubes"},
+     {t:"22:00", w:"<b>Astro Tour</b> at Minas de San José <span class='tag'>book ahead</span>"},
+   ]},
+  {n:7, date:"FRI · SEP 11", base:"SOUTH · VILAFLOR",
+   title:'New moon · <em>darkest sky</em>',
+   lede:"Masca gorge (boots mandatory, return by 14:00) or a slow Punta de Teno + Alcalá day. Then the darkest sky of your trip.",
+   img:["milky-way,tenerife","masca,gorge,hike","alcala,tenerife,coast"],
+   fb:"fb-stargaze",
+   wx:"23°C / 3°C SUMMIT", alt:"2,718 m", moon:"NEW MOON · darkest",
+   route:["VIL","MAS","TEN","ALC","LGI","MNJ"], focus:"MNJ",
+   schedule:[
+     {t:"08:30", w:"<b>Masca Gorge</b> · shuttle from Santiago del Teide <span class='tag'>boots</span>"},
+     {t:"—", w:"Alt · <b>Punta de Teno</b> lighthouse + <b>Alcalá</b> afternoon"},
+     {t:"19:45", w:"Sunset · <b>Mirador Archipenque</b> over Los Gigantes"},
+     {t:"03:00", w:"Pre-dawn <b>Guajara ascent</b> — sunrise above the clouds"},
+   ]},
+  {n:8, date:"SAT · SEP 12", base:"SOUTH · LA CALETA",
+   title:'Coast · <em>fishing villages</em>',
+   lede:"Recovery. Sunrise at El Médano, fish lunch at Los Abrigos, slow beach afternoon, last big dinner over La Gomera.",
+   img:["los-abrigos,tenerife,harbour","el-medano,tenerife,beach","la-caleta,tenerife,sunset"],
+   fb:"fb-coast",
+   wx:"27°C / SEA 23°", alt:"0 m", moon:"Waxing crescent ☾",
+   route:["VIL","MED","ABR","ADE","LGI"], focus:"ABR",
+   schedule:[
+     {t:"07:30", w:"Sunrise · <b>El Médano</b> · Montaña Roja silhouette"},
+     {t:"13:00", w:"Lunch · <b>Los Abrigos</b> harbour — point at the fish"},
+     {t:"15:30", w:"Beach · Playa del Duque or <b>Playa de la Tejita</b>"},
+     {t:"19:45", w:"Sunset sail · <b>Los Gigantes</b> · dolphins, whales"},
+     {t:"21:30", w:"Last big dinner · <b>La Vieja</b>, La Caleta · sunset terrace"},
+   ]},
+  {n:9, date:"SUN · SEP 13", base:"DEPART · TFS",
+   title:'Adios · <em>El Médano</em>',
+   lede:"Last swim at El Médano if flight times allow. Drop the car at TFS.",
+   img:["el-medano,tenerife,morning","tenerife,airport,departure","montana-roja,tenerife"],
+   fb:"fb-depart",
+   wx:"26°C", alt:"0 m", moon:"Waxing crescent",
+   route:["ADE","MED","TFS"], focus:"TFS",
+   schedule:[
+     {t:"08:00", w:"Last swim · <b>El Médano</b>"},
+     {t:"11:00", w:"Drop car at <b>TFS</b>, depart"},
+   ]},
+];
+
+/* ===== SVG helpers ===== */
+const NS = "http://www.w3.org/2000/svg";
+function el(tag, attrs={}, parent){
+  const n = document.createElementNS(NS,tag);
+  for(const k in attrs) n.setAttribute(k,attrs[k]);
+  if(parent) parent.appendChild(n);
+  return n;
+}
+const ISLAND_PATH = ISLAND_PATH_NEW;
+
+function buildRoute(stops){
+  return stops.map((s,i)=>(i===0?`M ${STOPS[s].x} ${STOPS[s].y}`:`L ${STOPS[s].x} ${STOPS[s].y}`)).join(" ");
+}
+
+/* ===== Build map inset for a scene ===== */
+function buildInset(day){
+  const svg = el("svg",{viewBox:"120 30 700 580",preserveAspectRatio:"xMidYMid meet"});
+  // local gradient for sand
+  const defs = el("defs",{},svg);
+  const g = el("linearGradient",{id:"sandGrad",x1:"0",y1:"0",x2:"0",y2:"1"},defs);
+  el("stop",{offset:"0%","stop-color":"#fff0a8"},g);
+  el("stop",{offset:"55%","stop-color":"#ffe066"},g);
+  el("stop",{offset:"100%","stop-color":"#ffb627"},g);
+  // sea background
+  el("rect",{x:120,y:30,width:700,height:580,fill:"#48cae4"},svg);
+  // island shadow + fill
+  el("path",{d:ISLAND_PATH,fill:"rgba(29,42,58,0.18)",transform:"translate(3,5)"},svg);
+  el("path",{d:ISLAND_PATH,class:"island-fill"},svg);
+  el("path",{d:ISLAND_PATH,class:"island-stroke"},svg);
+  // little volcano + sun
+  const vg = el("g",{transform:"translate(369,340)"},svg);
+  el("polygon",{points:"-10,14 2,-20 14,14",fill:"#e63946",stroke:"#1d2a3a","stroke-width":"1.2"},vg);
+  el("polygon",{points:"-1,-12 2,-20 5,-12",fill:"#fff"},vg);
+  el("circle",{cx:760,cy:80,r:14,fill:"#ffc93c",stroke:"#1d2a3a","stroke-width":"1.5"},svg);
+  // dim full overview (light dots of all stops)
+  Object.keys(STOPS).forEach(k=>{
+    el("circle",{cx:STOPS[k].x,cy:STOPS[k].y,r:1.2,fill:"rgba(29,42,58,0.3)"},svg);
+  });
+  // route
+  el("path",{d:buildRoute(day.route),class:"route-live"},svg);
+  // markers for this day
+  day.route.forEach((k,i)=>{
+    const s = STOPS[k];
+    const cls = "mk" + (s.kind?" "+s.kind:"") + (i===0?" start":"");
+    el("circle",{cx:s.x,cy:s.y,r:3.2,class:cls},svg);
+    // small label
+    const lbl = el("text",{x:s.x+5,y:s.y-4,class:"mk-label"},svg);
+    lbl.textContent = s.n.toUpperCase();
+  });
+  // focus pulse
+  const f = STOPS[day.focus] || STOPS[day.route[day.route.length-1]];
+  el("circle",{cx:f.x,cy:f.y,r:3,class:"pulse"},svg);
+  return svg;
+}
+
+/* ===== Build scenes ===== */
+const scenesEl = document.getElementById("scenes");
+DAYS.forEach((d,i)=>{
+  const s = document.createElement("div");
+  s.className = "scene";
+  s.dataset.idx = i;
+
+  // derive imagery from the day's actual stops:
+  // - hero = focus stop's image (or first non-airport stop)
+  // - supp = next two distinct stops
+  const nonStart = d.route.filter(k=>STOPS[k].kind!=="start");
+  const focusKey = d.focus && nonStart.includes(d.focus) ? d.focus : nonStart[0] || d.route[0];
+  const otherKeys = nonStart.filter(k=>k!==focusKey);
+  const heroKey  = focusKey;
+  const supp1Key = otherKeys[0] || focusKey;
+  const supp2Key = otherKeys[1] || otherKeys[0] || focusKey;
+  const queryFor = (k) => (STOP_INFO[k] && STOP_INFO[k].img) ? STOP_INFO[k].img : (d.img[0]);
+  const iconFor  = (k) => (STOP_INFO[k] && STOP_INFO[k].icon) ? STOP_INFO[k].icon : "📍";
+  const nameFor  = (k) => STOPS[k] ? STOPS[k].n : "";
+
+  const lock = 2100 + i*9;
+  const photoUrl  = getPhotoUrl(heroKey, 'hero');
+  const photoUrl2 = getPhotoUrl(heroKey, 'hero');
+
+  s.innerHTML = `
+    <div class="bg-fallback ${d.fb}"></div>
+    <div class="scene-poster">
+      <div class="pi">${iconFor(heroKey)}</div>
+      <div class="pn">${nameFor(heroKey)}</div>
+      <div class="pc">Day ${d.n} · ${d.base}</div>
+    </div>
+    <div class="bg-photo" data-src="${photoUrl}" data-alt="${photoUrl2}"></div>
+    <div class="vignette"></div>
+
+    <div class="top-eyebrow">
+      <span class="num">${String(d.n).padStart(2,'0')}</span>
+      <span class="sep"></span>
+      <span class="col">
+        <span>${d.date}</span>
+        <b>${d.base}</b>
+      </span>
+    </div>
+
+    <div class="map-inset">
+      <div class="h"><span>TODAY'S ROUTE</span><b>${d.route.length} STOPS</b></div>
+    </div>
+
+    <div class="supp">
+      <div class="supp-thumb" data-src="${getPhotoUrl(supp1Key, 'thumb')}">
+        <div class="cap">${nameFor(supp1Key)}</div>
+      </div>
+      <div class="supp-thumb" data-src="${getPhotoUrl(supp2Key, 'thumb')}">
+        <div class="cap">${nameFor(supp2Key)}</div>
+      </div>
+    </div>
+
+    <div class="center">
+      <h2>${d.title}</h2>
+      <p class="lede">${d.lede}</p>
+    </div>
+
+    <div class="bottom">
+      <div class="schedule">
+        ${d.schedule.map(r=>{
+          // Auto-link every <b>Place Name</b> to a Google Photos image search
+          const linked = r.w.replace(/<b>(.*?)<\/b>/g, (_, name) => {
+            const q = encodeURIComponent(name + ' Tenerife');
+            return `<b><a class="place-link" href="https://www.google.com/search?q=${q}&tbm=isch" target="_blank" rel="noopener" onclick="event.stopPropagation()">${name} 🖼</a></b>`;
+          });
+          return `<div class="sched-row"><div class="t">${r.t}</div><div class="w">${linked}</div></div>`;
+        }).join("")}
+      </div>
+      <div class="stats">
+        <div class="stat"><div class="k">WEATHER</div><div class="v"><em>${d.wx}</em></div></div>
+        <div class="stat"><div class="k">ALTITUDE</div><div class="v">${d.alt}</div></div>
+        <div class="stat"><div class="k">MOON</div><div class="v">${d.moon}</div></div>
+      </div>
+    </div>
+  `;
+
+  // attach inset svg
+  const insetSvg = buildInset(d);
+  s.querySelector(".map-inset").appendChild(insetSvg);
+
+  scenesEl.appendChild(s);
+
+  // lazy load photo with fallback chain
+  const photo = s.querySelector(".bg-photo");
+  const img = new Image();
+  img.onload = ()=>{ photo.style.backgroundImage = `url("${photoUrl}")`; photo.classList.add("loaded"); };
+  img.onerror = ()=>{
+    const alt = new Image();
+    alt.onload = ()=>{ photo.style.backgroundImage = `url("${photoUrl2}")`; photo.classList.add("loaded"); };
+    alt.onerror = ()=>{}; // poster shows through
+    alt.src = photoUrl2;
+  };
+  img.src = photoUrl;
+
+  // lazy supplementary thumbs with real Unsplash photos
+  s.querySelectorAll(".supp-thumb").forEach(t=>{
+    const url = t.dataset.src;
+    const im = new Image();
+    im.onload = ()=> t.style.backgroundImage = `url("${url}")`;
+    im.onerror = ()=> t.classList.add(d.fb);
+    im.src = url;
+  });
+});
+
+/* ===== Filmstrip ===== */
+const strip = document.getElementById("strip");
+DAYS.forEach((d,i)=>{
+  const c = document.createElement("button");
+  c.className = "chip";
+  c.dataset.idx = i;
+  const nonStart = d.route.filter(k=>STOPS[k].kind!=="start");
+  const focusKey = d.focus && nonStart.includes(d.focus) ? d.focus : nonStart[0] || d.route[0];
+  const url = getPhotoUrl(focusKey, 'chip');
+  c.innerHTML = `
+    <div class="ph-fallback ${d.fb}"></div>
+    <div class="ph" style="background-image:none"></div>
+    <div class="ph-grad"></div>
+    <div class="lbl"><span>${d.title.replace(/<[^>]+>/g,'')}</span><span class="num">${String(d.n).padStart(2,'0')}</span></div>
+    <div class="progress"></div>
+  `;
+  strip.appendChild(c);
+  c.addEventListener("click",()=>{ stopAuto(); go(i); });
+
+  const ph = c.querySelector(".ph");
+  const im = new Image();
+  im.onload = ()=> ph.style.backgroundImage = `url("${url}")`;
+  im.onerror = ()=>{};
+  im.src = url;
+});
+
+/* ===== JOURNEY: day-by-day map with animated car ===== */
+const journeyMap = document.getElementById("journeyMap");
+const dayTabsEl  = document.getElementById("dayTabs");
+const stopList   = document.getElementById("stopList");
+const stopPhoto  = document.getElementById("stopPhoto");
+const stopFallback = document.getElementById("stopFallback");
+
+let journeyDay = 0;
+let stopIdx = 0;
+let carAnim = null;
+let journeyAuto = false;
+let journeyTimer = null;
+const STEP_DUR = 1800;
+const AUTO_PAUSE = 1400;
+
+let routeTotalLen = 0;
+let routeCumLens = [0];
+let routeSegLens = [];
+
+// build day tabs
+DAYS.forEach((d,i)=>{
+  const b = document.createElement("button");
+  b.className = "day-tab"+(i===0?" active":"");
+  b.dataset.idx = i;
+  b.innerHTML = `<span class="num">${String(i+1).padStart(2,'0')}</span><span>${d.date.split('·')[0].trim()}</span>`;
+  b.addEventListener("click", ()=> setJourneyDay(i));
+  dayTabsEl.appendChild(b);
+});
+
+function setJourneyDay(i){
+  journeyDay = i;
+  stopIdx = 0;
+  stopJourneyAuto();
+  document.querySelectorAll(".day-tab").forEach((t,j)=>t.classList.toggle("active",j===i));
+  buildJourneyMap();
+  buildStopList();
+  updateStop(true);
+}
+
+function buildJourneyMap(){
+  const d = DAYS[journeyDay];
+  journeyMap.innerHTML = "";
+
+  // gradient defs
+  const defs = el("defs",{},journeyMap);
+  const grad = el("linearGradient",{id:"sandGrad",x1:"0",y1:"0",x2:"0",y2:"1"},defs);
+  el("stop",{offset:"0%","stop-color":"#fff0a8"},grad);
+  el("stop",{offset:"55%","stop-color":"#ffe066"},grad);
+  el("stop",{offset:"100%","stop-color":"#ffb627"},grad);
+  // also make jLandGrad alias for legacy refs
+  const grad2 = el("linearGradient",{id:"jLandGrad",x1:"0",y1:"0",x2:"0",y2:"1"},defs);
+  el("stop",{offset:"0%","stop-color":"#fff0a8"},grad2);
+  el("stop",{offset:"55%","stop-color":"#ffe066"},grad2);
+  el("stop",{offset:"100%","stop-color":"#ffb627"},grad2);
+  // sea wave pattern
+  const waveP = el("pattern",{id:"waves",width:60,height:20,patternUnits:"userSpaceOnUse"},defs);
+  el("path",{d:"M0 10 Q15 4 30 10 T60 10",fill:"none",stroke:"rgba(255,255,255,0.35)","stroke-width":"1.6","stroke-linecap":"round"},waveP);
+
+  // sea backdrop with waves
+  el("rect",{x:120,y:30,width:700,height:580,fill:"url(#waves)"},journeyMap);
+
+  // big sun top-left/right
+  const sunG = el("g",{transform:"translate(770,80)"},journeyMap);
+  for(let i=0;i<12;i++){
+    const a = i*Math.PI/6;
+    el("line",{x1:Math.cos(a)*22,y1:Math.sin(a)*22,x2:Math.cos(a)*32,y2:Math.sin(a)*32,stroke:"#ffc93c","stroke-width":"3","stroke-linecap":"round"},sunG);
+  }
+  el("circle",{cx:0,cy:0,r:18,fill:"#ffc93c",stroke:"#1d2a3a","stroke-width":"2.5"},sunG);
+  el("circle",{cx:-5,cy:-3,r:2,fill:"#1d2a3a"},sunG);
+  el("circle",{cx:5,cy:-3,r:2,fill:"#1d2a3a"},sunG);
+  el("path",{d:"M -6 4 Q 0 9 6 4",fill:"none",stroke:"#1d2a3a","stroke-width":"2","stroke-linecap":"round"},sunG);
+
+  // fish swimming SW
+  drawFish(180,520,"#ff6b35", journeyMap);
+  drawFish(230,560,"#ff6b9d", journeyMap);
+  drawFish(160,470,"#6a4c93", journeyMap);
+  // fish E
+  drawFish(740,420,"#ff6b35", journeyMap);
+  drawFish(760,470,"#6a4c93", journeyMap, true);
+  // sailboat NW
+  drawBoat(190,180, journeyMap);
+  // sailboat E
+  drawBoat(720,230, journeyMap);
+  // whale tail / dolphin
+  drawDolphin(750,540, journeyMap);
+  drawDolphin(160,150, journeyMap, true);
+  // small cloud
+  drawCloud(280,90, journeyMap);
+  drawCloud(620,540, journeyMap);
+
+  // island (shadow then fill)
+  el("path",{d:ISLAND_PATH,fill:"rgba(29,42,58,0.18)",transform:"translate(5,7)"},journeyMap);
+  el("path",{d:ISLAND_PATH,class:"island-fill"},journeyMap);
+  el("path",{d:ISLAND_PATH,class:"island-stroke"},journeyMap);
+
+  // volcano over Teide
+  drawVolcano(369,340, journeyMap);
+  // palm trees scattered
+  drawPalm(460,290, journeyMap);
+  drawPalm(500,400, journeyMap);
+  drawPalm(280,350, journeyMap);
+  // dragon tree
+  drawDragonTree(320,290, journeyMap);
+  // cacti
+  drawCactus(395,470, journeyMap);
+  // beach umbrella at La Caleta
+  drawUmbrella(290,475, journeyMap);
+  // surfboard at El Médano
+  drawSurfboard(460,535, journeyMap);
+  // little house cluster
+  drawHouse(640,180, journeyMap);
+  drawHouse(560,180, journeyMap);
+  drawHouse(450,200, journeyMap);
+
+  // dim all-island stop dots (not on today's route)
+  Object.keys(STOPS).forEach(k=>{
+    if(d.route.includes(k)) return;
+    el("circle",{cx:STOPS[k].x,cy:STOPS[k].y,r:1.6,fill:"rgba(29,42,58,0.35)"},journeyMap);
+  });
+
+  // route paths
+  el("path",{d:buildRoute(d.route),class:"j-route-bg"},journeyMap);
+  el("path",{d:buildRoute(d.route),class:"j-route-fg",id:"jRouteFg"},journeyMap);
+
+  // drive-time labels at the midpoint of each segment
+  // viewBox units → km: ~0.127 km/unit · road factor 1.5 · avg 50 km/h
+  for(let si=1; si<d.route.length; si++){
+    const a = STOPS[d.route[si-1]], b = STOPS[d.route[si]];
+    const dx = b.x - a.x, dy = b.y - a.y;
+    const dist = Math.hypot(dx, dy);
+    if(dist < 24) continue; // skip very short segments
+    const km = dist * 0.127 * 1.5;
+    const min = Math.max(5, Math.round(km / 50 * 60 / 5) * 5);
+    const mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2;
+    const len = dist || 1;
+    // perpendicular offset so chip sits beside the line, not on it
+    const ox = -dy / len * 12;
+    const oy =  dx / len * 12;
+    const lx = mx + ox, ly = my + oy;
+    const txt = `${min} MIN`;
+    const w = txt.length * 5.8 + 10;
+    const g = el("g", {transform:`translate(${lx},${ly})`}, journeyMap);
+    el("rect", {x:-w/2, y:-8.5, width:w, height:17, rx:8.5, fill:"#fff", stroke:"#1d2a3a", "stroke-width":1.2}, g);
+    const t = el("text", {x:0, y:4, "text-anchor":"middle"}, g);
+    t.setAttribute("style","font-family:'Space Mono',monospace;font-size:9.5px;font-weight:700;fill:#1d2a3a;letter-spacing:0.06em");
+    t.textContent = txt;
+  }
+
+  // markers + labels (clickable)
+  d.route.forEach((k,i)=>{
+    const s = STOPS[k];
+    const c = el("circle",{cx:s.x,cy:s.y,r:5,class:"j-mk","data-i":i,style:"cursor:pointer"},journeyMap);
+    c.addEventListener("click",()=>{ stopJourneyAuto(); jumpTo(i); });
+    // label background "tag"
+    const lblText = s.n.toUpperCase();
+    const w = lblText.length * 6 + 8;
+    const lblBg = el("rect",{x:s.x+8,y:s.y-7,width:w,height:14,rx:3,fill:"#fff",stroke:"#1d2a3a","stroke-width":"1","data-i":i,"data-bg":"1"},journeyMap);
+    const lbl = el("text",{x:s.x+12,y:s.y+3,class:"j-mk-label","data-i":i},journeyMap);
+    lbl.textContent = lblText;
+  });
+
+  // pulse on current
+  const cur = STOPS[d.route[0]];
+  el("circle",{cx:cur.x,cy:cur.y,r:6,class:"j-pulse",id:"jPulse"},journeyMap);
+
+  // car (last so it draws on top)
+  buildCar();
+
+  // measure route
+  routeSegLens = [];
+  routeCumLens = [0];
+  let cum = 0;
+  for(let i=1;i<d.route.length;i++){
+    const a = STOPS[d.route[i-1]], b = STOPS[d.route[i]];
+    const len = Math.hypot(b.x-a.x, b.y-a.y);
+    routeSegLens.push(len);
+    cum += len;
+    routeCumLens.push(cum);
+  }
+  routeTotalLen = cum;
+  const fg = document.getElementById("jRouteFg");
+  fg.style.strokeDasharray = routeTotalLen;
+  fg.style.strokeDashoffset = routeTotalLen;
+}
+
+/* ===== Decorative icons ===== */
+function drawFish(x,y,color,parent,flip){
+  const g = el("g",{transform:`translate(${x},${y})${flip?" scale(-1,1)":""}`},parent);
+  el("ellipse",{cx:0,cy:0,rx:9,ry:5,fill:color,stroke:"#1d2a3a","stroke-width":"1.2"},g);
+  el("polygon",{points:"-9,0 -16,-5 -16,5",fill:color,stroke:"#1d2a3a","stroke-width":"1.2"},g);
+  el("circle",{cx:4,cy:-1.5,r:1.2,fill:"#1d2a3a"},g);
+}
+function drawBoat(x,y,parent){
+  const g = el("g",{transform:`translate(${x},${y})`},parent);
+  el("path",{d:"M-14 0 L14 0 L10 6 L-10 6 Z",fill:"#fff",stroke:"#1d2a3a","stroke-width":"1.4"},g);
+  el("line",{x1:0,y1:0,x2:0,y2:-18,stroke:"#1d2a3a","stroke-width":"1.4"},g);
+  el("path",{d:"M0 -18 L10 0 L0 0 Z",fill:"#ff6b35",stroke:"#1d2a3a","stroke-width":"1.2"},g);
+  el("path",{d:"M0 -18 L-9 -2 L0 -2 Z",fill:"#fff",stroke:"#1d2a3a","stroke-width":"1.2"},g);
+}
+function drawDolphin(x,y,parent,flip){
+  const g = el("g",{transform:`translate(${x},${y})${flip?" scale(-1,1)":""}`},parent);
+  el("path",{d:"M -10 0 Q -5 -8 5 -6 Q 12 -4 14 2 Q 8 4 0 3 Q -6 3 -10 0 Z",fill:"#fff",stroke:"#1d2a3a","stroke-width":"1.2"},g);
+  el("path",{d:"M 14 2 L 20 -2 L 18 5 Z",fill:"#fff",stroke:"#1d2a3a","stroke-width":"1.2"},g);
+  el("circle",{cx:-4,cy:-2,r:0.9,fill:"#1d2a3a"},g);
+}
+function drawCloud(x,y,parent){
+  const g = el("g",{transform:`translate(${x},${y})`},parent);
+  el("ellipse",{cx:0,cy:0,rx:14,ry:6,fill:"#fff",stroke:"#1d2a3a","stroke-width":"1.2"},g);
+  el("ellipse",{cx:-7,cy:-3,rx:7,ry:5,fill:"#fff",stroke:"#1d2a3a","stroke-width":"1.2"},g);
+  el("ellipse",{cx:6,cy:-3,rx:6,ry:4,fill:"#fff",stroke:"#1d2a3a","stroke-width":"1.2"},g);
+}
+function drawVolcano(x,y,parent){
+  const g = el("g",{transform:`translate(${x},${y})`},parent);
+  // back peak
+  el("polygon",{points:"-26,18 -8,-22 6,-2",fill:"#c1351f",stroke:"#1d2a3a","stroke-width":"1.4"},g);
+  // front peak (taller)
+  el("polygon",{points:"-14,22 2,-30 22,22",fill:"#e63946",stroke:"#1d2a3a","stroke-width":"1.6"},g);
+  // snow cap
+  el("polygon",{points:"-3,-22 2,-30 7,-22 5,-19 -1,-19",fill:"#fff",stroke:"#1d2a3a","stroke-width":"1"},g);
+  // lava drip
+  el("path",{d:"M -2 -23 L 0 -16 L -4 -10 L -1 -4",fill:"none",stroke:"#ffc93c","stroke-width":"1.8","stroke-linecap":"round"},g);
+  // smoke
+  el("circle",{cx:2,cy:-36,r:5,fill:"#fff",stroke:"#1d2a3a","stroke-width":"1"},g);
+  el("circle",{cx:-3,cy:-42,r:3.5,fill:"#fff",stroke:"#1d2a3a","stroke-width":"1"},g);
+}
+function drawPalm(x,y,parent){
+  const g = el("g",{transform:`translate(${x},${y})`},parent);
+  // trunk
+  el("path",{d:"M 0 0 Q -2 -6 0 -16 Q 2 -22 -1 -28",fill:"none",stroke:"#7a4d2c","stroke-width":"3.2","stroke-linecap":"round"},g);
+  // 5 fronds
+  el("path",{d:"M 0 -28 Q -10 -36 -18 -32",fill:"none",stroke:"#43aa8b","stroke-width":"3","stroke-linecap":"round"},g);
+  el("path",{d:"M 0 -28 Q 10 -36 18 -32",fill:"none",stroke:"#43aa8b","stroke-width":"3","stroke-linecap":"round"},g);
+  el("path",{d:"M 0 -28 Q -8 -42 -14 -42",fill:"none",stroke:"#2d6a4f","stroke-width":"3","stroke-linecap":"round"},g);
+  el("path",{d:"M 0 -28 Q 8 -42 14 -42",fill:"none",stroke:"#2d6a4f","stroke-width":"3","stroke-linecap":"round"},g);
+  el("path",{d:"M 0 -28 L 0 -42",fill:"none",stroke:"#2d6a4f","stroke-width":"3","stroke-linecap":"round"},g);
+  el("circle",{cx:0,cy:-28,r:2.5,fill:"#7cb342",stroke:"#1d2a3a","stroke-width":"0.8"},g);
+}
+function drawDragonTree(x,y,parent){
+  const g = el("g",{transform:`translate(${x},${y})`},parent);
+  el("rect",{x:-3,y:-10,width:6,height:14,fill:"#7a4d2c",stroke:"#1d2a3a","stroke-width":"1",rx:1},g);
+  el("circle",{cx:-6,cy:-14,r:7,fill:"#43aa8b",stroke:"#1d2a3a","stroke-width":"1"},g);
+  el("circle",{cx:6,cy:-14,r:7,fill:"#2d6a4f",stroke:"#1d2a3a","stroke-width":"1"},g);
+  el("circle",{cx:0,cy:-20,r:8,fill:"#43aa8b",stroke:"#1d2a3a","stroke-width":"1"},g);
+}
+function drawCactus(x,y,parent){
+  const g = el("g",{transform:`translate(${x},${y})`},parent);
+  el("rect",{x:-3,y:-14,width:6,height:14,fill:"#43aa8b",stroke:"#1d2a3a","stroke-width":"1.2",rx:3},g);
+  el("rect",{x:-9,y:-10,width:5,height:7,fill:"#43aa8b",stroke:"#1d2a3a","stroke-width":"1.2",rx:2},g);
+  el("rect",{x:4,y:-9,width:5,height:6,fill:"#43aa8b",stroke:"#1d2a3a","stroke-width":"1.2",rx:2},g);
+  el("circle",{cx:0,cy:-15,r:1.5,fill:"#ff6b9d"},g);
+}
+function drawUmbrella(x,y,parent){
+  const g = el("g",{transform:`translate(${x},${y})`},parent);
+  el("line",{x1:0,y1:-2,x2:0,y2:10,stroke:"#1d2a3a","stroke-width":"1.5"},g);
+  el("path",{d:"M -12 -2 Q 0 -16 12 -2 Z",fill:"#ff6b35",stroke:"#1d2a3a","stroke-width":"1.4"},g);
+  el("path",{d:"M -8 -2 Q -6 -10 -4 -2",fill:"#fff"},g);
+  el("path",{d:"M 4 -2 Q 6 -10 8 -2",fill:"#fff"},g);
+}
+function drawSurfboard(x,y,parent){
+  const g = el("g",{transform:`translate(${x},${y}) rotate(-30)`},parent);
+  el("ellipse",{cx:0,cy:0,rx:3,ry:14,fill:"#fff",stroke:"#1d2a3a","stroke-width":"1.2"},g);
+  el("line",{x1:0,y1:-10,x2:0,y2:10,stroke:"#ff6b35","stroke-width":"1.5"},g);
+}
+function drawHouse(x,y,parent){
+  const g = el("g",{transform:`translate(${x},${y})`},parent);
+  el("rect",{x:-5,y:-4,width:10,height:8,fill:"#fff",stroke:"#1d2a3a","stroke-width":"1.2"},g);
+  el("polygon",{points:"-7,-4 0,-10 7,-4",fill:"#e63946",stroke:"#1d2a3a","stroke-width":"1.2"},g);
+  el("rect",{x:-1.5,y:-1,width:3,height:5,fill:"#1d2a3a"},g);
+}
+
+function buildCar(){
+  const d = DAYS[journeyDay];
+  const s = STOPS[d.route[0]];
+  const g = el("g",{class:"car-icon",id:"car",transform:`translate(${s.x},${s.y}) rotate(0)`},journeyMap);
+  el("ellipse",{class:"car-shadow",cx:0,cy:6,rx:10,ry:2.5},g);
+  el("rect",{class:"car-body",x:-9,y:-5,width:18,height:10,rx:2.5},g);
+  el("rect",{class:"car-window",x:-4,y:-4,width:8,height:8,rx:1},g);
+  el("circle",{class:"car-wheel",cx:-6,cy:-6.2,r:1.4},g);
+  el("circle",{class:"car-wheel",cx:6,cy:-6.2,r:1.4},g);
+  el("circle",{class:"car-wheel",cx:-6,cy:6.2,r:1.4},g);
+  el("circle",{class:"car-wheel",cx:6,cy:6.2,r:1.4},g);
+  el("rect",{class:"car-light",x:8,y:-2,width:1.5,height:4,rx:0.5},g);
+}
+
+function setCarPos(x,y,angle){
+  const c = document.getElementById("car");
+  if(c) c.setAttribute("transform", `translate(${x},${y}) rotate(${angle})`);
+}
+
+function setRouteProgress(idx, t=0){
+  const drawn = (routeCumLens[idx] || 0) + (t>0 ? t*(routeSegLens[idx]||0) : 0);
+  const fg = document.getElementById("jRouteFg");
+  if(fg) fg.style.strokeDashoffset = Math.max(0, routeTotalLen - drawn);
+}
+
+function easeInOutQuad(t){ return t<0.5 ? 2*t*t : -1+(4-2*t)*t; }
+
+function step(dir, onDone){
+  const d = DAYS[journeyDay];
+  const newIdx = stopIdx + dir;
+  if(newIdx < 0 || newIdx >= d.route.length){ if(onDone) onDone(); return; }
+  const from = STOPS[d.route[stopIdx]];
+  const to   = STOPS[d.route[newIdx]];
+  const angle = Math.atan2(to.y-from.y, to.x-from.x) * 180/Math.PI;
+  const startT = performance.now();
+  cancelAnimationFrame(carAnim);
+  function tick(now){
+    const dt = Math.min(1, (now-startT)/STEP_DUR);
+    const e = easeInOutQuad(dt);
+    setCarPos(from.x + (to.x-from.x)*e, from.y + (to.y-from.y)*e, angle);
+    const segIdx = Math.min(stopIdx, newIdx);
+    setRouteProgress(segIdx, dir>0 ? e : 1-e);
+    if(dt < 1){
+      carAnim = requestAnimationFrame(tick);
+    } else {
+      stopIdx = newIdx;
+      updateStop();
+      if(onDone) onDone();
+    }
+  }
+  carAnim = requestAnimationFrame(tick);
+}
+
+function jumpTo(target){
+  if(target === stopIdx) return;
+  const dir = Math.sign(target - stopIdx);
+  step(dir, ()=>{ if(stopIdx !== target) jumpTo(target); });
+}
+
+function autoNext(){
+  const d = DAYS[journeyDay];
+  if(stopIdx >= d.route.length-1){ stopJourneyAuto(); return; }
+  step(+1, ()=>{
+    if(journeyAuto){
+      journeyTimer = setTimeout(autoNext, AUTO_PAUSE);
+    }
+  });
+}
+function startJourneyAuto(){
+  const d = DAYS[journeyDay];
+  if(stopIdx >= d.route.length-1){
+    stopIdx = 0; updateStop(true);
+    // also rebuild route progress
+    setRouteProgress(0);
+    setCarPos(STOPS[d.route[0]].x, STOPS[d.route[0]].y, 0);
+  }
+  journeyAuto = true;
+  document.getElementById("jAuto").textContent = "❚❚ PAUSE";
+  autoNext();
+}
+function stopJourneyAuto(){
+  journeyAuto = false;
+  const ab = document.getElementById("jAuto");
+  if(ab) ab.textContent = "▶ DRIVE";
+  cancelAnimationFrame(carAnim);
+  clearTimeout(journeyTimer);
+}
+
+function updateStop(skipPhoto){
+  const d = DAYS[journeyDay];
+  const key = d.route[stopIdx];
+  const info = STOP_INFO[key] || {};
+  const s = STOPS[key];
+
+  document.getElementById("stopNum").textContent = String(stopIdx+1).padStart(2,'0');
+  document.getElementById("stopTotal").textContent = String(d.route.length).padStart(2,'0');
+  document.getElementById("stopName").textContent = s.n;
+  document.getElementById("stopDesc").textContent = info.desc || "";
+  const mapLink = document.getElementById("stopMapLink");
+  if(mapLink) mapLink.href = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(s.n + " Tenerife");
+
+  // poster + fallback bg
+  stopFallback.className = "stop-fallback " + d.fb;
+  document.getElementById("stopIcon").textContent = info.icon || "📍";
+  document.getElementById("stopPoster").textContent = s.n;
+
+  // photo with multi-source fallback
+  stopPhoto.classList.remove("live");
+  if(info.img){
+    const url  = getPhotoUrl(key, 'panel');
+    const urlA = getPhotoUrl(key, 'panel');
+    function showPhoto(u){
+      stopPhoto.style.backgroundImage = `url("${u}")`;
+      requestAnimationFrame(()=>{
+        stopPhoto.style.transform = "scale(1.0)";
+        requestAnimationFrame(()=>{
+          stopPhoto.classList.add("live");
+          stopPhoto.style.transform = "";
+        });
+      });
+    }
+    const im = new Image();
+    im.onload = ()=> showPhoto(url);
+    im.onerror = ()=>{
+      const alt = new Image();
+      alt.onload = ()=> showPhoto(urlA);
+      alt.onerror = ()=>{}; // poster shows
+      alt.src = urlA;
+    };
+    im.src = url;
+  }
+
+  // route + markers
+  setRouteProgress(stopIdx);
+  document.querySelectorAll(".j-mk").forEach(m=>{
+    const i = +m.dataset.i;
+    m.classList.toggle("done", i<stopIdx);
+    m.classList.toggle("cur",  i===stopIdx);
+  });
+  document.querySelectorAll(".j-mk-label").forEach(t=>{
+    t.classList.toggle("cur", +t.dataset.i===stopIdx);
+  });
+  const pulse = document.getElementById("jPulse");
+  if(pulse){ pulse.setAttribute("cx",s.x); pulse.setAttribute("cy",s.y); }
+
+  // progress bar
+  const prog = document.getElementById("jProg");
+  prog.innerHTML = d.route.map((_,i)=>{
+    const cls = i<stopIdx ? "done" : (i===stopIdx ? "cur" : "");
+    return `<div class="j-prog-seg ${cls}"></div>`;
+  }).join("");
+
+  // buttons
+  document.getElementById("jPrev").disabled = stopIdx<=0;
+  document.getElementById("jNext").disabled = stopIdx>=d.route.length-1;
+
+  // stop list highlight
+  document.querySelectorAll(".stop-row").forEach((r,i)=>{
+    r.classList.toggle("active", i===stopIdx);
+    if(i===stopIdx) r.scrollIntoView({block:"nearest",behavior:"smooth"});
+  });
+
+  // if not animating, snap car
+  if(skipPhoto){
+    setCarPos(s.x, s.y, 0);
+  }
+}
+
+function photosUrl(key){
+  const s = STOPS[key];
+  const q = encodeURIComponent((s.n || key) + ' Tenerife');
+  return `https://www.google.com/search?q=${q}&tbm=isch`;
+}
+
+function buildStopList(){
+  const d = DAYS[journeyDay];
+  stopList.innerHTML = d.route.map((k,i)=>{
+    const info = STOP_INFO[k] || {};
+    const desc = (info.desc || "").replace(/"/g,'&quot;');
+    const url  = photosUrl(k);
+    return `
+      <div class="stop-row" data-i="${i}">
+        <div class="sr-thumb"><div class="sr-fb ${d.fb}"></div><div class="sr-img" data-q="${encodeURIComponent(info.img||'')}" data-k="${k}"></div></div>
+        <div class="sr-name"><b>${STOPS[k].n}</b><span class="sub">${desc}</span></div>
+        <div class="sr-actions">
+          <span class="sr-idx">${String(i+1).padStart(2,'0')}</span>
+          <a class="sr-photos" href="${url}" target="_blank" rel="noopener" title="See photos" onclick="event.stopPropagation()">🖼</a>
+        </div>
+      </div>`;
+  }).join("");
+  stopList.querySelectorAll(".stop-row").forEach(r=>{
+    r.addEventListener("click",()=>{ stopJourneyAuto(); jumpTo(+r.dataset.i); });
+    const ti = r.querySelector(".sr-img");
+    const k = ti?.dataset.k;
+    if(k){
+      const url = getPhotoUrl(k,'chip');
+      const im = new Image();
+      im.onload = ()=>{ ti.style.backgroundImage=`url("${url}")`; ti.classList.add("live"); };
+      im.onerror = ()=>{};
+      im.src = url;
+    }
+  });
+}
+
+document.getElementById("jPrev").addEventListener("click",()=>{ stopJourneyAuto(); if(stopIdx>0) step(-1); });
+document.getElementById("jNext").addEventListener("click",()=>{
+  stopJourneyAuto();
+  const d = DAYS[journeyDay];
+  if(stopIdx<d.route.length-1) step(+1);
+});
+document.getElementById("jAuto").addEventListener("click",()=>{
+  if(journeyAuto) stopJourneyAuto();
+  else startJourneyAuto();
+});
+
+// init journey
+setJourneyDay(0);
+
+/* ===== Map row/thumb labels → STOPS keys (for click-to-swap-photo) ===== */
+const NAME_TO_STOP = {
+  "TFS":"TFS", "TFN":"TFN",
+  "Puerto de la Cruz":"PdC", "Plaza del Charco":"PdC", "La Cofradía de Pescadores":"PdC", "La Cofradía":"PdC",
+  "Cofradía":"PHI", "Punta del Hidalgo":"PHI",
+  "Sendero de los Sentidos":"CdC", "Cruz del Carmen":"CdC", "Pico del Inglés":"CdC",
+  "Roque de Taborno":"TBR", "Taborno":"TBR",
+  "Playa de Benijo":"ANG", "Benijo":"ANG", "Roque de las Bodegas":"ANG",
+  "San Cristóbal de La Laguna":"LAG", "La Laguna":"LAG", "Mercado Municipal":"LAG",
+  "Tacoronte":"TAC",
+  "Guachinche El Miradero":"ICO", "El Miradero":"ICO", "Icod":"ICO",
+  "Mirador de Humboldt":"ORO", "La Orotava":"ORO", "Mirador Garañona":"ORO",
+  "El Caletón":"GAR", "Mirador de Garachico":"GAR", "Garachico":"GAR",
+  "Masca":"MAS", "Masca Gorge":"MAS", "Santiago del Teide":"MAS",
+  "Mirador de Cherfe":"CHE", "Cherfe":"CHE",
+  "Vilaflor":"VIL",
+  "Roques de García":"ROQ",
+  "La Rambleta":"TEI", "Narices del Teide":"TEI", "Telesforo Bravo":"TEI",
+  "Teide":"TEI", "Alto de Guajara":"TEI", "Guajara ascent":"TEI", "Guajara":"TEI",
+  "Mirador de Chipeque":"CHI", "Chipeque":"CHI",
+  "Minas de San José":"MNJ", "Astro Tour":"MNJ", "TF-21 pullout":"MNJ",
+  "Punta de Teno":"TEN",
+  "Alcalá":"ALC",
+  "Mirador Archipenque":"LGI", "Los Gigantes":"LGI",
+  "El Médano":"MED", "Playa de la Tejita":"MED",
+  "Los Abrigos":"ABR",
+  "Playa del Duque":"ADE", "La Caleta":"ADE", "La Vieja":"ADE",
+};
+function findStopFromText(text){
+  const t = (text||"").trim();
+  if(!t) return null;
+  if(NAME_TO_STOP[t]) return NAME_TO_STOP[t];
+  const tLow = t.toLowerCase();
+  for(const k in NAME_TO_STOP){
+    if(k.toLowerCase() === tLow) return NAME_TO_STOP[k];
+  }
+  // partial match fallback (longest match wins)
+  let best = null, bestLen = 0;
+  for(const k in NAME_TO_STOP){
+    if(t.includes(k) && k.length > bestLen){ best = NAME_TO_STOP[k]; bestLen = k.length; }
+  }
+  return best;
+}
+
+/* Swap scene hero photo, optionally restarting ken-burns */
+function swapScenePhoto(sceneEl, url, urlAlt){
+  const photo = sceneEl.querySelector(".bg-photo");
+  if(!photo) return;
+  function apply(u){
+    photo.classList.remove("loaded");
+    photo.style.animation = "none";
+    photo.style.backgroundImage = `url("${u}")`;
+    void photo.offsetWidth;
+    photo.style.animation = "";
+    requestAnimationFrame(()=> photo.classList.add("loaded"));
+  }
+  const img = new Image();
+  img.onload = ()=> apply(url);
+  img.onerror = ()=>{
+    if(!urlAlt) return;
+    const alt = new Image();
+    alt.onload = ()=> apply(urlAlt);
+    alt.onerror = ()=> photo.classList.remove("loaded");
+    alt.src = urlAlt;
+  };
+  img.src = url;
+}
+
+/* Wire up clicks on each scene's rows + thumbs */
+document.querySelectorAll(".scene").forEach(s=>{
+  function activate(key, src){
+    if(!key) return;
+    const info = STOP_INFO[key];
+    if(!info || !info.img) return;
+    stopAuto();
+    const url  = getPhotoUrl(key, 'hero');
+    const urlA = getPhotoUrl(key, 'hero');
+    swapScenePhoto(s, url, urlA);
+    // update poster to match new place
+    const poster = s.querySelector(".scene-poster");
+    if(poster){
+      poster.querySelector(".pi").textContent = (info.icon || "📍");
+      poster.querySelector(".pn").textContent = (STOPS[key]?.n || "");
+    }
+    s.querySelectorAll(".sched-row").forEach(r=>r.classList.toggle("active", r===src));
+    s.querySelectorAll(".supp-thumb").forEach(t=>t.classList.toggle("active", t===src));
+  }
+  s.querySelectorAll(".sched-row").forEach(row=>{
+    const b = row.querySelector(".w b");
+    const key = b ? findStopFromText(b.textContent) : null;
+    if(!key) return;
+    row.classList.add("clickable");
+    row.dataset.stop = key;
+    row.addEventListener("click",()=>activate(key, row));
+  });
+  s.querySelectorAll(".supp-thumb").forEach(t=>{
+    const cap = t.querySelector(".cap");
+    const key = cap ? findStopFromText(cap.textContent) : null;
+    if(!key) return;
+    t.dataset.stop = key;
+    t.addEventListener("click",()=>activate(key, t));
+  });
+});
+
+/* ============ GUIDES (modals) ============ */
+const GUIDES = {
+  restaurants: {
+    icon:"🍽", eyebrow:"RESTAURANTS · BY CATEGORY", title:"Where to <em>eat</em>",
+    intro:"Eat where the locals eat: fishing-village fish, autumn-only guachinches, and a couple of splurges. Reserve the highlighted ones — September is still busy.",
+    sections: [
+      {h:"Fishing-village fresh fish",i:"🐟",items:[
+        {n:"La Cofradía de Pescadores",w:"Puerto de la Cruz harbour",p:"€€",t:"\"Fire, soul and fish.\" Cherne, vieja, lapas straight off the boats."},
+        {n:"Cofradía · Punta del Hidalgo",w:"North coast, near Anaga",p:"€",t:"Plastic chairs, no-frills, point at what you want. Chocos & octopus."},
+        {n:"Los Abrigos harbour",w:"South coast",p:"€€",t:"Multiple options on one quay. Tuesday evening fish market 6pm."},
+        {n:"El Rocás",w:"Tajao, south coast",p:"€€",t:"Hidden gem · locals pick from the bar, daily catch only."},
+      ]},
+      {h:"Guachinches (call ahead!)",i:"🍷",items:[
+        {n:"Guachinche El Miradero",w:"Icod de los Vinos",p:"€",t:"Year-round · Teide-view terrace · conejo en salmorejo, costillas con piñas."},
+        {n:"Mi Guachinche Casa Pedro",w:"Los Realejos",p:"€",t:"Year-round, family-run. Carne fiesta, escaldón de gofio, house wine in jars."},
+        {n:"Casa Egon / De David",w:"Santa Úrsula area",p:"€",t:"Seasonal · usually Oct–Apr. Check before you drive up."},
+      ]},
+      {h:"Splurges & Michelin",i:"⭐",items:[
+        {n:"La Vieja",w:"La Caleta, Costa Adeje",p:"€€€",t:"Alfresco terrace, sunset over La Gomera, fresh local fish. Reserve."},
+        {n:"El Rincón de Juan Carlos",w:"La Caleta",p:"€€€€",t:"Two Michelin stars. Tasting menu only · book weeks ahead."},
+        {n:"Kazan",w:"Santa Cruz",p:"€€€",t:"One Michelin star · Japanese-Canarian fusion."},
+        {n:"El Calderito de la Abuela",w:"La Vega, La Orotava",p:"€€",t:"Refined Canarian classics in a country house."},
+      ]},
+      {h:"Local breakfast & coffee",i:"☕",items:[
+        {n:"Plaza del Adelantado cafes",w:"La Laguna old town",p:"€",t:"Croissants, café cortado · pick any terrace under the trees."},
+        {n:"Café Atlántico",w:"Puerto de la Cruz",p:"€",t:"Old-school espresso bar · pastries & a tostada with tomato."},
+        {n:"Café del Sol",w:"Costa Adeje",p:"€€",t:"Sit-down brunch · avocado toast, smoothie bowls."},
+      ]},
+      {h:"Late-night & cocktails",i:"🍸",items:[
+        {n:"Magma",w:"Costa Adeje",p:"€€€",t:"Cocktails in a striking concrete + lava architecture space."},
+        {n:"La Tasca de Cristian",w:"La Laguna",p:"€€",t:"Late wine + tapas with students. Open until 1am."},
+        {n:"Mojos y Mojitos",w:"Puerto de la Cruz",p:"€€",t:"Beachfront cocktail bar, sunset to midnight."},
+      ]},
+      {h:"Vegetarian-friendly",i:"🥗",items:[
+        {n:"Mana",w:"Costa Adeje",p:"€€",t:"Plant-based menu, fresh juices, big bowls."},
+        {n:"El Maná",w:"Puerto de la Cruz",p:"€",t:"Vegetarian Canarian classics — escaldón made with veg broth."},
+        {n:"La Buena Vida",w:"La Laguna",p:"€",t:"Soups + salads + falafel · cheap & cheerful."},
+      ]},
+      {h:"Cheap eats · menú del día",i:"💶",items:[
+        {n:"Any bar with a menú del día",w:"Across the island",p:"€",t:"Look for €10–14 boards: starter + main + drink + dessert. Best at lunch."},
+        {n:"La Tapería",w:"La Laguna",p:"€",t:"Cheap and lively · tapas, octopus, papas."},
+        {n:"Tasca El Callejón",w:"Puerto de la Cruz",p:"€",t:"Generous portions, locals' lunch spot."},
+      ]},
+    ],
+  },
+
+  tips: {
+    icon:"✈", eyebrow:"TRAVEL TIPS · GOOD TO KNOW", title:"Trip <em>tips</em>",
+    intro:"Things that'll save you time, money or a missed booking. Read this before you fly — the summit permit alone needs 8 weeks lead time.",
+    sections:[
+      {h:"Driving",i:"🚗",tips:[
+        {b:"Anaga is slow.",t:"Allow 2× Google Maps time. Narrow, twisty roads, frequent goats, and many blind corners."},
+        {b:"Park early.",t:"Cruz del Carmen, Roques de García and Masca shuttle lots fill by 10am in peak season."},
+        {b:"Fog up to Teide.",t:"The TF-21 punches through cloud at ~1,500m. Headlights on, watch for cyclists."},
+        {b:"TF-1 is fastest E–W.",t:"Highway around the south coast. North–south transfer ≈ 1h15."},
+        {b:"Gas before Vilaflor.",t:"Fewer stations at altitude. Fill up in the lowlands."},
+      ]},
+      {h:"Bookings (book in this order)",i:"📅",tips:[
+        {b:"Teide summit permit · 8 weeks out.",t:"Telesforo Bravo trail. Permits open every Monday 7am Canary time for the following 28 days. Sells out fast.",warn:true},
+        {b:"Cable car · 1–2 weeks out.",t:"€40 return for non-residents, 8-min ride to 3,555m. Book online."},
+        {b:"Masca Gorge · 2–4 weeks out.",t:"Wed–Sat only, boots mandatory. Confirm boat-exit status at caminobarrancodemasca.com."},
+        {b:"La Vieja, El Rincón · weeks out.",t:"Top restaurants book well in advance — especially weekends."},
+        {b:"Astronomy tour · book before Sep 9.",t:"New-moon nights sell out. Astro Tour Teide and Night Skies Tenerife are the local operators."},
+      ]},
+      {h:"Weather, calima & altitude",i:"🌤",tips:[
+        {b:"Two climates.",t:"Coast 26–28°C, summit 6–15°C day / 0–5°C night. Pack for both."},
+        {b:"Watch for calima.",t:"Saharan dust haze. Kills photo clarity & stargazing. Check Aemet 1–2 days ahead.",warn:true},
+        {b:"Sun is intense at altitude.",t:"Even when cool. SPF 50+, hat, sunglasses on Teide hikes."},
+        {b:"Sea ≈ 23°C in September.",t:"Comfortable swimming. Watch tides at Benijo — most of the beach disappears at high tide."},
+      ]},
+      {h:"Money & language",i:"💶",tips:[
+        {b:"Euro · cards everywhere.",t:"But carry €20–40 cash for guachinches and small fishing-village spots."},
+        {b:"Tipping isn't expected.",t:"Round up or leave 5–10% for good service. No need to over-tip."},
+        {b:"Spanish basics help.",t:"\"Una caña\" = small beer · \"papas con mojo\" = potatoes with sauce · \"cuenta\" = bill · \"mojo\" pronounced \"moho\"."},
+      ]},
+      {h:"Safety & etiquette",i:"🌍",tips:[
+        {b:"Meals are late.",t:"Lunch 2–3pm, dinner 9–10pm. Many kitchens close 4–8pm — plan around it."},
+        {b:"Stay on marked trails.",t:"Volcanic terrain is loose and the sun is deceiving. 1.5L water per person on any Teide hike."},
+        {b:"Greet shopkeepers.",t:"\"Hola, buenos días\" goes a long way."},
+        {b:"Emergencies: 112.",t:"Single number for police, ambulance, fire, sea rescue."},
+      ]},
+      {h:"Sunsets & stargazing",i:"🌟",tips:[
+        {b:"Arrive 30 min before sunset.",t:"Mirador parking fills up. Bring a fleece — it drops fast after the sun goes."},
+        {b:"Red headtorch only.",t:"Preserves night vision for everyone at stargazing pullouts."},
+        {b:"Look south for the Milky Way.",t:"In September the galactic core arcs across the south after dark, before midnight."},
+      ]},
+    ],
+  },
+
+  hikes: {
+    icon:"🥾", eyebrow:"HIKES · BY DIFFICULTY", title:"Get out and <em>walk</em>",
+    intro:"From a misty laurel loop you can do in sneakers to a 12-hour summit ascent. Build up gradually if you're not acclimatised to altitude — Vilaflor at 1,400m is a good base for the bigger Teide hikes.",
+    sections:[
+      {h:"Easy · under 2 hours",i:"🌿",items:[
+        {n:"Sendero de los Sentidos",w:"Cruz del Carmen · Anaga",p:"1h · 2 km",t:"Misty laurisilva loop — Tenerife's most accessible Anaga walk. No gear needed."},
+        {n:"Roques de García loop",w:"Teide National Park",p:"2h · 3.5 km",t:"Iconic Cinchado-rock loop. No permit. Some altitude (2,100m) — go slow."},
+        {n:"Camino Rural · La Orotava",w:"Orotava valley",p:"1h · 2 km",t:"Flat path through chestnut groves with Teide framing the horizon."},
+      ]},
+      {h:"Moderate · half-day",i:"⛰",items:[
+        {n:"Roque de Taborno",w:"Anaga peninsula",p:"3–4h · 6 km",t:"Iconic ridge with sea views both sides. Exposed — windy days, take care."},
+        {n:"El Pijaral · Bosque Encantado",w:"Anaga",p:"3h · 5 km",t:"Permit required (free, online). Truly magical laurel forest with moss and twisted trees."},
+        {n:"Barranco del Infierno",w:"Adeje",p:"3h · 6.5 km",t:"Booking required. Cool gorge ending at a waterfall. Wed–Sun only."},
+      ]},
+      {h:"Hard · full day",i:"🏔",items:[
+        {n:"Alto de Guajara",w:"Teide National Park",p:"5h · 13 km",t:"Second-highest peak (2,718m). No permit. Best Teide view that doesn't need a permit."},
+        {n:"Masca Gorge",w:"Teno massif",p:"5–6h · 8 km",t:"Wed–Sat only. Boots mandatory, helmet provided. Return by 14:00.",warn:true},
+        {n:"Cruz del Carmen → Punta del Hidalgo",w:"Anaga ridge",p:"6h · 12 km",t:"Long descent from the laurels down to the sea. Catch the bus back up."},
+      ]},
+      {h:"Very hard · permit or pre-dawn start",i:"🌋",items:[
+        {n:"Telesforo Bravo · summit",p:"45 min · steep",w:"From cable-car top",t:"Permit required (book Monday 7am Canary, 8 weeks out). Final 200m to 3,715m crater rim.",warn:true},
+        {n:"Montaña Blanca → summit",w:"From TF-21",p:"10h · 17 km",t:"Full ascent on foot. Refuge sleep optional. The way real climbers do it."},
+        {n:"Pre-dawn Guajara",p:"5h · pre-dawn",w:"Start 3am",t:"Hike up by headtorch on the new-moon night, watch sunrise above the inversion."},
+      ]},
+    ],
+  },
+
+  sunsets: {
+    icon:"🌅", eyebrow:"SUNSETS · RANKED", title:"Where the <em>sun drops</em>",
+    intro:"Ranked roughly by quality, not convenience. The locals' picks are at the top; the famous ones lower down. Always arrive 30 minutes early — both for parking and the colour show.",
+    sections:[
+      {h:"Top picks (locals')",i:"🌄",items:[
+        {n:"01 · Mirador Pico del Inglés",w:"Anaga, 5 min from Cruz del Carmen",p:"FREE · QUIET",t:"West-facing toward Teide. Locals' favourite. Even weekends are calm."},
+        {n:"02 · Mirador Garañona",w:"El Sauzal · Calle la Jara",p:"FREE · QUIET",t:"Teide + the north coastline in one frame. Almost no tourists."},
+        {n:"03 · Mirador de Cherfe",w:"Between Masca & Santiago del Teide",p:"FREE · QUIET",t:"Sun drops behind the Teno mountains, dramatic shadows. Far fewer people than Masca village."},
+      ]},
+      {h:"In the park · above the clouds",i:"☁",items:[
+        {n:"04 · Mirador de las Narices del Teide",w:"TF-38 inside the park",p:"FREE · MID",t:"Locals-favoured sunset inside Teide NP. Volcano flank glows red."},
+        {n:"05 · Mirador de Chipeque",w:"TF-24 from La Esperanza",p:"FREE · MID",t:"Pine forest in the foreground, mar de nubes (sea of clouds) below."},
+      ]},
+      {h:"Coastal classics",i:"🌊",items:[
+        {n:"06 · Mirador Archipenque",w:"Above Los Gigantes",p:"FREE · BUSY",t:"Cliffs + Atlantic + La Gomera silhouette. La Palma on clear days."},
+        {n:"07 · Punta de Teno",w:"Westernmost point",p:"GATE TIMES",t:"Dramatic lighthouse setting. Vehicle access restricted — drive in early or take bus 369."},
+      ]},
+    ],
+  },
+
+  stargazing: {
+    icon:"✨", eyebrow:"STARGAZING · NEW MOON SEP 11", title:"Above the <em>inversion</em>",
+    intro:"Tenerife's altitude + lack of light pollution makes it one of Europe's best stargazing islands. Your trip lands on a near-perfect new moon (Sep 11) — these are the nights to push for the high pullouts.",
+    sections:[
+      {h:"Best nights for YOU",i:"🌑",items:[
+        {n:"Sep 9 · Wed",p:"☾ thin crescent",w:"Pristine after sunset",t:"Crescent rises late · skies dark from dusk on. Easier kickoff night."},
+        {n:"Sep 10 · Thu",p:"☾ thin crescent",w:"Even darker",t:"Almost no moon. Great if Sep 11 weather is uncertain."},
+        {n:"Sep 11 · Fri · NEW MOON",p:"DARKEST",w:"Push for this one",t:"The darkest night of the year here. Worth a pre-dawn Guajara summit attempt."},
+        {n:"Sep 12 · Sat",p:"☽ waxing crescent",w:"Still excellent",t:"Crescent sets early, dark after ~9pm."},
+      ]},
+      {h:"Where to set up",i:"📍",items:[
+        {n:"Minas de San José",w:"TF-21 inside the park",p:"\"TENERIFE MARS\"",t:"Reddish volcanic landscape, 2,100m. No light pollution at all."},
+        {n:"Mirador de la Tarta",w:"TF-21 pullout",p:"CLEAR SOUTHERN HORIZON",t:"Layered geological cross-section · iconic foreground for Milky Way shots."},
+        {n:"Mirador Las Cañadas",w:"TF-21 / TF-24",p:"AWAY FROM PARADOR",t:"Multiple pullouts away from the Parador hotel lights."},
+        {n:"Vilaflor outskirts",w:"If you can't reach the park",p:"BACKUP",t:"Above 1,400m, well clear of coastal light. Acceptable on cloudier nights."},
+      ]},
+      {h:"What to bring",i:"🎒",tips:[
+        {b:"Layers — really.",t:"Drops to 3–6°C at altitude even in September. Fleece + windproof shell."},
+        {b:"Red headtorch.",t:"White light wrecks night vision for everyone. Many phones have a red-light mode."},
+        {b:"Hot drink in a thermos.",t:"Two hours of staring up gets cold fast."},
+        {b:"Star chart / Stellarium app.",t:"Identify Saturn (well-placed in September) and the galactic core."},
+      ]},
+      {h:"Guided tours · book ahead",i:"🔭",tips:[
+        {b:"Astro Tour Teide.",t:"Telescopes + laser-pointer constellation tours · they know the pullouts."},
+        {b:"Night Skies Tenerife.",t:"Smaller groups, photography-friendly."},
+        {b:"Why bother?",t:"Local operators can show you details you'd miss alone — Saturn's rings, double stars, deep-sky objects."},
+      ]},
+      {h:"Photo settings (rough start)",i:"📷",tips:[
+        {b:"Wide & fast lens.",t:"14–24mm at f/2.8 or wider. Manual focus to infinity."},
+        {b:"20–30s exposure.",t:"At wide angle, 30s is fine before stars trail. Use the \"500 rule\"."},
+        {b:"ISO 1600–3200.",t:"Modern cameras handle this clean. Bracket and review."},
+      ]},
+    ],
+  },
+
+  beaches: {
+    icon:"🏖", eyebrow:"BEACHES · NORTH TO SOUTH", title:"Where to <em>swim</em>",
+    intro:"Tenerife has every kind of beach: imported golden sand, jet-black volcanic sand, wild rocky coves, calm family pools, and surfer-favourite breaks. Sea is around 23°C in September.",
+    sections:[
+      {h:"Family-friendly · calm",i:"👨‍👩‍👧",items:[
+        {n:"Playa de las Teresitas",w:"Santa Cruz · north",p:"GOLDEN · CALM",t:"Palm-fringed, imported Sahara sand. Sheltered bay, perfect for kids."},
+        {n:"Playa del Duque",w:"Costa Adeje · south",p:"POSH · CALM",t:"Golden sand, sun loungers, beachfront restaurants. Resort vibe."},
+        {n:"Playa de la Arena",w:"Puerto Santiago",p:"BLACK · SHELTERED",t:"Blue Flag black-sand beach, lifeguarded, family setup."},
+      ]},
+      {h:"Locals' picks",i:"🌴",items:[
+        {n:"Playa de la Tejita",w:"Under Montaña Roja",p:"LONG · LESS DEVELOPED",t:"Long stretch of golden sand. Less polished than Duque · go for the silhouette walk."},
+        {n:"Playa de Bollullo",w:"East of Puerto de la Cruz",p:"BLACK · 15 MIN HIKE",t:"Park up, walk down through banana plants. Wilder cove, fewer people."},
+        {n:"Playa Diego Hernández",w:"Costa Adeje",p:"HIDDEN COVE",t:"Hike-only access. Clothing optional. Sunset is special here."},
+      ]},
+      {h:"Wild & dramatic",i:"🌋",items:[
+        {n:"Playa de Benijo",w:"Anaga · north coast",p:"BLACK SAND · TIDE",t:"Iconic rock spires rising from black sand. Check tide table — most disappears at high tide.",warn:true},
+        {n:"Playa de Almáciga",w:"Anaga, next to Benijo",p:"BLACK · WAVY",t:"Surfer territory. Powerful waves, gorgeous setting."},
+        {n:"Playa de la Caleta",w:"Anaga",p:"PEBBLE · WILD",t:"Tiny rocky cove with a single fish shack. Rare and quiet."},
+      ]},
+      {h:"Surfer / wind",i:"🏄",items:[
+        {n:"Playa de El Médano",w:"South coast",p:"WINDY · SURFER",t:"Trade winds make this Tenerife's windsurf + kitesurf hub. Sunrise here is unmatched."},
+        {n:"Playa Las Américas / Fañabé",w:"Costa Adeje",p:"BUSY · LESSONS",t:"Where surf schools take you. Beginner-friendly waves."},
+      ]},
+      {h:"Lava pools (no sand, all swim)",i:"🐚",items:[
+        {n:"El Caletón",w:"Garachico",p:"FREE · NATURAL",t:"Natural pools formed by the 1706 lava flow. Calm even on rough days."},
+        {n:"Charco del Viento",w:"La Guancha",p:"FREE · QUIET",t:"Wave-fed lava pool, locals know it. Park above and walk down."},
+      ]},
+    ],
+  },
+
+  packing: {
+    icon:"🎒", eyebrow:"PACKING LIST · SEA TO SUMMIT", title:"What to <em>pack</em>",
+    intro:"You'll go from 23°C sea swims to single-digit summit nights in the same day. Pack layers — not bulk. Boots and a fleece are non-negotiable.",
+    sections:[
+      {h:"Clothing",i:"👕",tips:[
+        {b:"Light layers.",t:"T-shirts, light long-sleeve, shorts, light trousers. Coast is 26–28°C."},
+        {b:"Fleece + windproof shell.",t:"Absolutely essential at altitude. Single digits at night."},
+        {b:"Warm hat + thin gloves.",t:"If you're attempting the summit at 3,715m or a pre-dawn Guajara."},
+        {b:"Swimsuit · 2.",t:"One's always wet. Quick-dry microfibre towel."},
+        {b:"One nicer outfit.",t:"For La Vieja, El Rincón, or any guachinche evening you want to look intentional in."},
+      ]},
+      {h:"Footwear",i:"👟",tips:[
+        {b:"Hiking boots.",t:"Sturdy, ankle-support. Mandatory for Masca, strongly recommended for Guajara.",warn:true},
+        {b:"Trainers.",t:"For city walks (La Laguna, Puerto)."},
+        {b:"Sandals or flip-flops.",t:"For lava pools and beaches."},
+      ]},
+      {h:"Sun protection",i:"☀",tips:[
+        {b:"SPF 50+ · reef-safe.",t:"Sun is intense at altitude even when cool."},
+        {b:"Sunglasses.",t:"Polarised for driving the TF-21 in glare."},
+        {b:"Wide-brim hat.",t:"Or buy a straw one locally as a souvenir."},
+      ]},
+      {h:"Tech & misc",i:"🔌",tips:[
+        {b:"Headtorch.",t:"Red light mode preferred for stargazing. Vital if you do a pre-dawn hike."},
+        {b:"Portable battery.",t:"Long days of photos + maps drain phones fast."},
+        {b:"EU plug adapter.",t:"Type C/F. Most modern hotels have USB sockets too."},
+        {b:"Reusable 1.5L water bottle.",t:"You'll thank yourself on every hike."},
+        {b:"Motion sickness pills.",t:"The Anaga roads will test you.",warn:true},
+        {b:"Small daypack.",t:"15–20L for hikes, beach kit, and groceries."},
+      ]},
+    ],
+  },
+};
+
+/* ===== render + open / close modal ===== */
+const modalBackdrop = document.getElementById("modalBackdrop");
+const modalBody = document.getElementById("modalBody");
+
+function renderGuide(key){
+  const g = GUIDES[key];
+  if(!g) return;
+  const isPacking = key === "packing";
+  // pull saved checklist state
+  let packState = {};
+  if(isPacking){
+    try{ packState = JSON.parse(localStorage.getItem("tenerife_packing") || "{}"); }catch{}
+  }
+  const sectionsHtml = g.sections.map((s, si)=>{
+    const headHtml = `<h4><span class="ic">${s.i||""}</span> ${s.h}</h4>`;
+    if(s.items){
+      const itemsHtml = s.items.map(it=>`
+        <div class="ml-item">
+          <div class="top">
+            <span class="name">${it.n}</span>
+            <span class="price">${it.p||""}</span>
+          </div>
+          ${it.w?`<div class="where">${it.w}</div>`:""}
+          <div class="note">${it.t}</div>
+        </div>
+      `).join("");
+      return `<div class="modal-section">${headHtml}<div class="modal-list">${itemsHtml}</div></div>`;
+    }
+    if(s.tips){
+      const tipsHtml = s.tips.map((tp, ti)=>{
+        if(isPacking){
+          const id = `p-${si}-${ti}`;
+          const checked = packState[id] ? "checked" : "";
+          return `<label class="ml-check ${tp.warn?'warn':''}">
+            <input type="checkbox" data-pack="${id}" ${checked}/>
+            <span class="box"></span>
+            <span class="txt"><b>${tp.b}</b> ${tp.t}</span>
+          </label>`;
+        }
+        return `<div class="ml-tip ${tp.warn?'warn':''}">
+          <span class="dot">!</span>
+          <div><b>${tp.b}</b> ${tp.t}</div>
+        </div>`;
+      }).join("");
+      return `<div class="modal-section">${headHtml}<div class="ml-tips">${tipsHtml}</div></div>`;
+    }
+    return "";
+  }).join("");
+
+  // packing summary footer
+  let packFootHtml = "";
+  if(isPacking){
+    const totalCount = g.sections.reduce((a,s)=>a + (s.tips?s.tips.length:0), 0);
+    const doneCount = Object.values(packState).filter(Boolean).length;
+    packFootHtml = `<div class="pack-foot"><span><b>${doneCount}/${totalCount}</b> packed</span><button id="packReset">Reset list</button></div>`;
+  }
+
+  modalBody.innerHTML = `
+    <span class="modal-eyebrow">${g.eyebrow}</span>
+    <h2 class="modal-title">${g.icon} ${g.title}</h2>
+    <p class="modal-intro">${g.intro}</p>
+    ${sectionsHtml}
+    ${packFootHtml}
+  `;
+
+  if(isPacking){
+    // wire checkboxes
+    modalBody.querySelectorAll("input[data-pack]").forEach(cb=>{
+      cb.addEventListener("change",()=>{
+        const id = cb.dataset.pack;
+        let st = {};
+        try{ st = JSON.parse(localStorage.getItem("tenerife_packing") || "{}"); }catch{}
+        if(cb.checked) st[id] = 1; else delete st[id];
+        localStorage.setItem("tenerife_packing", JSON.stringify(st));
+        // update counter
+        const total = modalBody.querySelectorAll("input[data-pack]").length;
+        const done = modalBody.querySelectorAll("input[data-pack]:checked").length;
+        const foot = modalBody.querySelector(".pack-foot b");
+        if(foot) foot.textContent = `${done}/${total}`;
+      });
+    });
+    const resetBtn = document.getElementById("packReset");
+    if(resetBtn) resetBtn.addEventListener("click",()=>{
+      if(!confirm("Clear all packing checkmarks?")) return;
+      localStorage.removeItem("tenerife_packing");
+      renderGuide(key);
+    });
+  }
+}
+
+function openGuide(key){
+  renderGuide(key);
+  modalBackdrop.classList.add("open");
+  modalBackdrop.setAttribute("aria-hidden","false");
+  document.body.style.overflow = "hidden";
+  modalBackdrop.scrollTop = 0;
+}
+function closeGuide(){
+  modalBackdrop.classList.remove("open");
+  modalBackdrop.setAttribute("aria-hidden","true");
+  document.body.style.overflow = "";
+}
+
+document.querySelectorAll("#toolkitButtons .tk-btn").forEach(b=>{
+  b.addEventListener("click",()=>openGuide(b.dataset.guide));
+});
+document.getElementById("modalClose").addEventListener("click", closeGuide);
+modalBackdrop.addEventListener("click", e=>{ if(e.target===modalBackdrop) closeGuide(); });
+document.addEventListener("keydown", e=>{
+  if(e.key==="Escape" && modalBackdrop.classList.contains("open")) closeGuide();
+});
+
+/* ===== Moon Tracker ===== */
+const moonData = [
+  {date:"SEP 05", day:"SAT", icon:"🌖", phase:"Waning gibbous", peak:false},
+  {date:"SEP 06", day:"SUN", icon:"🌗", phase:"Last quarter", peak:false},
+  {date:"SEP 07", day:"MON", icon:"🌘", phase:"Waning crescent", peak:false},
+  {date:"SEP 08", day:"TUE", icon:"🌘", phase:"Waning crescent", peak:false},
+  {date:"SEP 09", day:"WED", icon:"🌑", phase:"New approaching", peak:true},
+  {date:"SEP 10", day:"THU", icon:"🌑", phase:"Very thin crescent", peak:true},
+  {date:"SEP 11", day:"FRI", icon:"🌑", phase:"NEW MOON", peak:true},
+  {date:"SEP 12", day:"SAT", icon:"🌒", phase:"Waxing crescent", peak:true},
+  {date:"SEP 13", day:"SUN", icon:"🌒", phase:"Waxing crescent", peak:false},
+];
+const moonRowEl = document.getElementById("moonRow");
+if(moonRowEl){
+  moonData.forEach(m=>{
+    const cell = document.createElement("div");
+    cell.className = "moon-cell" + (m.peak ? " peak" : "");
+    cell.innerHTML = `<div class="m-icon">${m.icon}</div><div class="m-date">${m.date.split(' ')[1]}</div><div class="m-day">${m.day}</div>`;
+    cell.title = `${m.date} · ${m.phase}`;
+    moonRowEl.appendChild(cell);
+  });
+}
+
+/* ===== Day-by-day plan =====
+   Each slot: t = label, time = clock time, price = cost string, free = true if free, c = description
+================================================================ */
+const DAY_PLAN = [
+  { n:1, date:"Sept 5 · Sat", title:"Arrival · Puerto de la Cruz", base:"North", tags:["food"],
+    summary:"Land at TFS afternoon. Drive north (~50 min). Easy harbor walk + sunset.",
+    slots:[
+      {t:"Afternoon", time:"~15:00", price:"Car ~€35–50/day", c:"<strong>Land at TFS</strong>, pick up rental car. Drive to <strong>Puerto de la Cruz</strong> via TF-1 → TF-5. (~50 min, 75 km)"},
+      {t:"Evening",   time:"~19:30", price:"Free", free:true, c:"Walk <strong>Plaza del Charco</strong>. Catch the first sunset from the harbor wall."},
+      {t:"Dinner",    time:"~21:00", price:"€18–25 p/p", c:"<strong>La Cofradía de Pescadores</strong> · simple fresh fish at the harbor. Order the fresh catch + house wine. No frills, real deal."}
+    ]},
+
+  { n:2, date:"Sept 6 · Sun", title:"Anaga Rural Park", base:"North", tags:["hike","sunset","food"],
+    summary:"Laurel forest + cliff coast + locals' sunset viewpoint.",
+    slots:[
+      {t:"08:00",     time:"08:00", price:"Free", free:true, c:"Drive to <strong>Cruz del Carmen</strong> visitor center (~40 min from Puerto de la Cruz). Walk the <strong>Sendero de los Sentidos</strong> — 1h misty laurel forest loop. Park early, spaces fill by 9:30."},
+      {t:"10:00",     time:"10:00", price:"Free", free:true, c:"<strong>Roque de Taborno</strong> hike from Taborno village. 3–4h, iconic Anaga ridge views. Far fewer people than Pico del Inglés."},
+      {t:"14:30",     time:"14:30", price:"Free", free:true, c:"Coastal drive to <strong>Roque de las Bodegas</strong> + <strong>Playa de Benijo</strong>. Check tide table — low tide makes the black-sand beach fully walkable."},
+      {t:"Sunset ~20:00", time:"~20:00", price:"Free", free:true, c:"<strong>Mirador Pico del Inglés</strong> · 5 min from Cruz del Carmen. Locals only, almost empty even weekends."},
+      {t:"Dinner ~21:30", time:"~21:30", price:"€20–28 p/p", c:"<strong>Cofradía de Pescadores, Punta del Hidalgo</strong> · plastic chairs, real fish. Order pulpo + fresh catch + half-litre house white."}
+    ]},
+
+  { n:3, date:"Sept 7 · Mon", title:"La Laguna · Wine Country · El Sauzal", base:"North", tags:["food","sunset"],
+    summary:"UNESCO old town, food market, guachinche lunch, Teide+coast sunset.",
+    slots:[
+      {t:"09:30", time:"09:30", price:"Coffee ~€1.50", c:"<strong>San Cristóbal de La Laguna</strong> old town. Coffee at Plaza del Adelantado. Browse <strong>Mercado Municipal</strong> on Plaza del Cristo."},
+      {t:"13:00", time:"13:00", price:"€10–14 p/p", c:"Drive to a year-round <strong>guachinche</strong> (call ahead). Try <strong>El Miradero</strong> in Icod with Teide views, or <strong>Mi Guachinche Casa Pedro</strong> in Los Realejos. Order conejo en salmorejo + carne fiesta + house wine in clay jars."},
+      {t:"16:00", time:"16:00", price:"Free", free:true, c:"<strong>Mirador de Humboldt</strong> · the view that allegedly moved Humboldt to tears in 1799."},
+      {t:"Sunset ~20:00", time:"~20:00", price:"Free", free:true, c:"<strong>Mirador Garañona</strong> above El Sauzal (Calle la Jara, Tacoronte) · Teide + coastline in one frame. Almost no tourists."}
+    ]},
+
+  { n:4, date:"Sept 8 · Tue", title:"Garachico · Teno · Move South", base:"Transition", tags:["sunset","food"],
+    summary:"Lava pools, Masca village, dramatic west-coast sunset, then drive to new base.",
+    slots:[
+      {t:"09:00", time:"09:00", price:"Free", free:true, c:"<strong>Garachico</strong> · town half-destroyed by 1706 eruption, now beautifully restored. Swim in <strong>El Caletón</strong>, the natural lava pools set into the hardened lava flow."},
+      {t:"13:00", time:"13:00", price:"€15–22 p/p", c:"Grilled fish + papas arrugadas at any harbor-side restaurant in Garachico. Order vieja or cherne."},
+      {t:"15:30", time:"15:30", price:"Free", free:true, c:"Mirador de Garachico, then drive TF-82 up to <strong>Masca village</strong> (~40 min). Just the village — save the gorge for Day 7."},
+      {t:"Sunset ~20:00", time:"~20:00", price:"Free", free:true, c:"<strong>Mirador de Cherfe</strong> between Masca and Santiago del Teide · sun drops behind the Teno mountains. Way fewer people than the Masca viewpoint."},
+      {t:"~21:30", time:"~21:30", price:"Supermarket run", c:"Drive south to new base — <strong>Vilaflor</strong> (for Teide) or <strong>La Caleta de Adeje</strong> (for coast). Stock up on supplies — Vilaflor has almost no dining after 9pm."}
+    ]},
+
+  { n:5, date:"Sept 9 · Wed", title:"Teide National Park · First Stars", base:"South", tags:["hike","sunset","stars"],
+    summary:"Roques de García, cable car to 3,555m, sunset at Narices, first stargazing night.",
+    slots:[
+      {t:"08:00", time:"08:00", price:"Free", free:true, c:"Drive into the park via TF-21. <strong>Roques de García</strong> loop — 3.5km, ~1.5h, no permit needed. Iconic Cinchado rock and crater views."},
+      {t:"11:00", time:"11:00", price:"€40 p/p return", c:"<strong>Teide cable car to La Rambleta</strong> (3,555m) — book online in advance. Without summit permit you get 1h up top. Walk to <strong>Mirador Pico Viejo</strong> (800m crater rim) and <strong>Mirador La Fortaleza</strong>."},
+      {t:"Sunset ~20:00", time:"~20:00", price:"Free", free:true, c:"Drive to <strong>Mirador de las Narices del Teide</strong> on TF-38. Locals' favorite sunset spot in the park — west-facing, above the cloud layer."},
+      {t:"After dark ~22:00", time:"~22:00", price:"Free", free:true, c:"Pullout near <strong>Minas de San José</strong>. Bring layers — single figures Celsius at 2,000m+ even in September. Milky Way galactic centre visible to the south."}
+    ]},
+
+  { n:6, date:"Sept 10 · Thu", title:"Summit + Peak Stargazing", base:"South", tags:["hike","sunset","stars"],
+    summary:"Teide summit (permit) or Guajara alternative. Night = deepest dark sky.",
+    slots:[
+      {t:"07:00", time:"07:00", price:"Permit free + €40 cable car", c:"<strong>Telesforo Bravo permit holders</strong>: cable car up, hike summit (3,715m) — ~45 min steep, very short. No permit? <strong>Alto de Guajara</strong> — 5h round trip, second-highest peak, jaw-dropping Teide views, no permit needed."},
+      {t:"15:00", time:"15:00", price:"€3–6", c:"Recover with coffee + cake in <strong>Vilaflor</strong> — highest village in Spain at 1,400m. Altitude fatigue is real; sit, eat, hydrate."},
+      {t:"Sunset ~20:00", time:"~20:00", price:"Free", free:true, c:"<strong>Mirador de Chipeque</strong> on TF-24 from La Esperanza · pines + Teide silhouette + sea of clouds below."},
+      {t:"Night ~22:00", time:"~22:00", price:"€45–65 p/p", c:"<strong>Peak stargazing night.</strong> Book guided astronomy tour — <strong>Night Skies Tenerife</strong> or <strong>Astro Tour Teide</strong>. They bring telescopes + laser-point constellations. Saturn is well-placed in September."}
+    ]},
+
+  { n:7, date:"Sept 11 · Fri", title:"Masca Gorge OR Punta de Teno · New Moon", base:"South", tags:["hike","sunset","stars","sunrise"],
+    summary:"Toughest hike day OR coastal day. Darkest night of the entire trip.",
+    slots:[
+      {t:"08:00", time:"08:30", price:"~€20 shuttle + €10 boat", c:"<strong>Masca gorge</strong>: park at Santiago del Teide cemetery, take 8:30am shuttle, descend gorge (2–4h). Boots mandatory. Verify boat-back access on caminobarrancodemasca.com before you go."},
+      {t:"Alt: 07:30", time:"07:30", price:"Free / Bus €2", free:true, c:"<strong>Alt — Punta de Teno lighthouse</strong> · westernmost tip of Tenerife. Restricted vehicle access — take bus 369 from Buenavista del Norte, or drive in before the gate closes (~8am)."},
+      {t:"14:00", time:"14:00", price:"Free", free:true, c:"Chill in <strong>Alcalá</strong> · quiet coastal town, completely different vibe from the resorts. Grab an ice cream, walk the promenade."},
+      {t:"Sunset ~20:00", time:"~20:00", price:"Free", free:true, c:"<strong>Mirador Archipenque</strong> above Los Gigantes · ocean + La Gomera silhouette, and on clear days La Palma and El Hierro too."},
+      {t:"Night ~23:00", time:"~23:00", price:"Free", free:true, c:"<strong>New moon · darkest sky of the year.</strong> If you have the legs: pre-dawn Guajara hike from 3am gives hours of pristine dark sky + sunrise above the cloud sea."}
+    ]},
+
+  { n:8, date:"Sept 12 · Sat", title:"Coast Day · Sunrise · Last Big Dinner", base:"South", tags:["sunrise","food","sunset"],
+    summary:"East-facing sunrise, fishing village lunch, beach recovery, splurge dinner.",
+    slots:[
+      {t:"07:00", time:"07:00", price:"Free", free:true, c:"<strong>El Médano beach</strong> with Montaña Roja silhouette · one of the few east-facing beaches with clean unobstructed sunrise views. Get there by 7am."},
+      {t:"10:30", time:"10:30", price:"€18–25 p/p", c:"<strong>Los Abrigos</strong> fishing village. Pick a harbor restaurant, point at a fish (vieja, cherne, or sama), eat it grilled with papas arrugadas + red and green mojo."},
+      {t:"13:00", time:"13:00", price:"Free", free:true, c:"Beach afternoon at <strong>Playa de la Tejita</strong> under Montaña Roja (locals' beach, no sunbeds) — or <strong>Playa del Duque</strong> if you want a lounger and resort comfort."},
+      {t:"Dinner ~20:30", time:"~20:30", price:"€60–90 p/p", c:"<strong>La Vieja</strong> in La Caleta de Adeje — book the terrace over the sea. Or <strong>El Rincón de Juan Carlos</strong> (2 Michelin stars, ~€120 p/p with wine). Either way, this is the splurge night — reserve 1–2 weeks ahead."}
+    ]},
+
+  { n:9, date:"Sept 13 · Sun", title:"Departure Day", base:"South", tags:["sunrise"],
+    summary:"Last sunrise, one more coffee, head home.",
+    slots:[
+      {t:"07:00", time:"07:00", price:"Free", free:true, c:"<strong>Playa de las Teresitas</strong> or the <strong>La Caleta seafront</strong> for a quiet final sunrise. Bring takeaway coffee."},
+      {t:"09:00", time:"09:00", price:"€3–5", c:"Breakfast in a local bar. Don't skip gofio toast or a <em>tostada con tomate</em> if you see it — last real Canarian breakfast."},
+      {t:"11:00", time:"11:00", price:"Included in rental", c:"Drive to TFS — ~25 min from Costa Adeje / La Caleta. Allow 1h45 before your departure time. Return car, check in, done."}
+    ]},
+];
+
+const dayPlanEl = document.getElementById("dayPlan");
+if(dayPlanEl){
+  const TAG_LABELS = {sunset:"🌅 Sunset", sunrise:"🌄 Sunrise", hike:"🥾 Hike", stars:"✨ Stars", food:"🍽 Food"};
+
+  // Per-day estimated total spend
+  const DAY_BUDGET = [
+    "~€60–80", "~€25–35", "~€20–30", "~€20–30",
+    "~€45–55", "~€55–80", "~€15–25", "~€80–120", "~€10–15"
+  ];
+
+  DAY_PLAN.forEach((day, idx)=>{
+    const card = document.createElement("div");
+    card.className = "dp-card";
+    const tagsHtml = day.tags.map(t=>`<span class="dp-tag ${t}">${TAG_LABELS[t]||t}</span>`).join("");
+    const slotsHtml = day.slots.map(s=>{
+      const priceClass = s.free ? "dp-price free" : "dp-price paid";
+      const priceIcon  = s.free ? "✓ Free" : s.price;
+      return `
+      <div class="dp-slot">
+        <div class="dp-slot-left">
+          <div class="dp-time">${s.time || s.t}</div>
+          <div class="${priceClass}">${priceIcon}</div>
+        </div>
+        <div class="dp-slot-body">${s.c}</div>
+      </div>`;
+    }).join("");
+
+    card.innerHTML = `
+      <button class="dp-header" onclick="(function(btn){var card=btn.closest('.dp-card');card.classList.toggle('open');btn.querySelector('.dp-chev').style.transform=card.classList.contains('open')?'rotate(180deg)':''})(this)">
+        <div class="dp-num">${day.n}</div>
+        <div class="dp-hinfo">
+          <div class="dp-date">${day.date} · Base: ${day.base}</div>
+          <div class="dp-title">${day.title}</div>
+          <div class="dp-summary">${day.summary}</div>
+          <div class="dp-tags">${tagsHtml}<span class="dp-budget">${DAY_BUDGET[idx]} est.</span></div>
+        </div>
+        <div class="dp-chev">▾</div>
+      </button>
+      <div class="dp-body">
+        <div class="dp-slots">${slotsHtml}</div>
+      </div>`;
+    dayPlanEl.appendChild(card);
+  });
+}
+
+/* ===== Playback ===== */
+let cur = 0, auto = true, timer = null, sceneDur = 9000, startedAt = 0;
+
+const sceneEls = ()=>document.querySelectorAll(".scene");
+const chipEls  = ()=>document.querySelectorAll(".chip");
+
+function go(i){
+  cur = (i+DAYS.length)%DAYS.length;
+  sceneEls().forEach((s,idx)=> s.classList.toggle("active", idx===cur));
+  chipEls().forEach((c,idx)=>{
+    c.classList.toggle("active", idx===cur);
+    const p = c.querySelector(".progress");
+    p.style.width = (idx<cur)?"100%":"0%";
+  });
+  document.getElementById("dayCounter").textContent = `DAY ${String(cur+1).padStart(2,'0')} / 09`;
+  if(auto) restartProgress();
+}
+function next(){ go(cur+1); }
+function prev(){ go(cur-1); }
+
+function restartProgress(){
+  const p = chipEls()[cur].querySelector(".progress");
+  p.style.width = "0%";
+  // force reflow then animate
+  void p.offsetWidth;
+  p.style.transition = `width ${sceneDur}ms linear`;
+  p.style.width = "100%";
+}
+
+function startAuto(){
+  auto = true;
+  document.getElementById("playBtn").textContent = "❚❚ PAUSE";
+  document.getElementById("playBtn").classList.remove("paused");
+  restartProgress();
+  clearInterval(timer);
+  timer = setInterval(()=>{ cur=(cur+1)%DAYS.length; go(cur); }, sceneDur);
+}
+function stopAuto(){
+  auto = false;
+  document.getElementById("playBtn").textContent = "▶ PLAY";
+  document.getElementById("playBtn").classList.add("paused");
+  clearInterval(timer);
+  // freeze progress
+  const p = chipEls()[cur].querySelector(".progress");
+  const w = getComputedStyle(p).width;
+  p.style.transition = "none";
+  p.style.width = w;
+}
+
+document.getElementById("playBtn").addEventListener("click", ()=>{ auto ? stopAuto() : startAuto(); });
+document.getElementById("prevBtn").addEventListener("click", ()=>{ stopAuto(); prev(); });
+document.getElementById("nextBtn").addEventListener("click", ()=>{ stopAuto(); next(); });
+document.getElementById("prevBtn2").addEventListener("click", ()=>{ stopAuto(); prev(); });
+document.getElementById("nextBtn2").addEventListener("click", ()=>{ stopAuto(); next(); });
+document.addEventListener("keydown", e=>{
+  if(e.key==="ArrowRight"){ stopAuto(); next(); }
+  if(e.key==="ArrowLeft"){ stopAuto(); prev(); }
+  if(e.key===" "){ e.preventDefault(); auto?stopAuto():startAuto(); }
+});
+
+// swipe support
+let touchX = null;
+document.getElementById("cinema").addEventListener("touchstart", e=>{ touchX = e.touches[0].clientX; }, {passive:true});
+document.getElementById("cinema").addEventListener("touchend", e=>{
+  if(touchX===null) return;
+  const dx = e.changedTouches[0].clientX - touchX;
+  if(Math.abs(dx) > 60){ stopAuto(); (dx<0?next:prev)(); }
+  touchX = null;
+}, {passive:true});
+
+// start
+go(0);
+setTimeout(startAuto, 800);
+</script>
+
+</body>
+</html>
