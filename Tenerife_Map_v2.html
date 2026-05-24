@@ -2,8 +2,13 @@
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<title>Tenerife · Sept 5–13, 2026 · Cinema Cut</title>
-<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Nine Days on Tenerife 🌋</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="description" content="Nine days on Tenerife, Sept 5–13 2026. Made with love for Petra Maria de Jesus." />
+<meta name="theme-color" content="#0077b6" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Tenerife 🌋" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bagel+Fat+One&family=Fredoka:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -992,9 +997,135 @@
     .sr-actions{gap:5px}
     .sr-idx{font-size:15px}
   }
+  /* ============ countdown banner ============ */
+  .countdown-bar{
+    position:fixed;bottom:0;left:0;right:0;z-index:100;
+    background:linear-gradient(90deg, var(--sea-deep), #023e6b);
+    color:#fff;display:flex;align-items:center;justify-content:center;
+    gap:6px;padding:10px 16px;
+    font-family:"Space Mono",monospace;font-size:11px;letter-spacing:0.1em;
+    text-transform:uppercase;font-weight:700;
+    border-top:3px solid var(--sun);
+    box-shadow:0 -4px 20px rgba(0,0,0,0.3);
+    transition:transform 0.4s ease;
+  }
+  .countdown-bar.hidden{transform:translateY(100%)}
+  .cd-label{opacity:0.7;letter-spacing:0.14em}
+  .cd-units{display:flex;gap:10px;align-items:center}
+  .cd-unit{
+    display:flex;flex-direction:column;align-items:center;gap:1px;
+    background:rgba(255,255,255,0.1);border-radius:8px;
+    padding:4px 10px;min-width:44px;border:1px solid rgba(255,255,255,0.2);
+  }
+  .cd-unit .n{font-size:18px;font-weight:700;line-height:1;font-family:"Bagel Fat One",cursive;color:var(--sun)}
+  .cd-unit .u{font-size:8px;opacity:0.6;letter-spacing:0.12em}
+  .cd-sep{font-size:18px;opacity:0.4;margin-bottom:10px}
+  .cd-dismiss{
+    position:absolute;right:12px;top:50%;transform:translateY(-50%);
+    background:none;border:none;color:rgba(255,255,255,0.4);font-size:18px;
+    cursor:pointer;padding:4px;line-height:1;
+  }
+  .cd-dismiss:hover{color:#fff}
+  /* shift filmstrip up when countdown showing */
+  .filmstrip{transition:bottom 0.4s ease}
+  body.cd-visible .filmstrip{bottom:52px}
+  @media(max-width:480px){
+    .countdown-bar{flex-wrap:wrap;gap:4px;padding:8px 12px 10px}
+    .cd-unit{min-width:38px;padding:3px 8px}
+    .cd-unit .n{font-size:16px}
+    body.cd-visible .filmstrip{bottom:72px}
+  }
+
+  /* ============ install banner ============ */
+  .install-banner{
+    position:fixed;top:52px;left:50%;transform:translateX(-50%);
+    z-index:90;background:var(--sun);color:var(--ink);
+    border:3px solid var(--ink);border-radius:16px;
+    padding:10px 16px;display:flex;align-items:center;gap:10px;
+    box-shadow:5px 5px 0 rgba(29,42,58,0.3);
+    font-family:"Space Mono",monospace;font-size:11px;font-weight:700;
+    letter-spacing:0.08em;text-transform:uppercase;white-space:nowrap;
+    opacity:0;pointer-events:none;transition:opacity 0.4s;
+  }
+  .install-banner.show{opacity:1;pointer-events:auto}
+  .install-banner button{
+    background:var(--ink);color:#fff;border:none;border-radius:8px;
+    padding:6px 12px;font-family:"Space Mono",monospace;font-size:10px;
+    font-weight:700;cursor:pointer;letter-spacing:0.08em;
+  }
+  .ib-close{background:none!important;color:var(--ink)!important;padding:2px 6px!important;font-size:16px!important}
+
+  /* ============ swipe hint ============ */
+  @keyframes swipeHint{
+    0%{transform:translateX(0);opacity:0.8}
+    30%{transform:translateX(-12px);opacity:1}
+    60%{transform:translateX(6px);opacity:0.9}
+    100%{transform:translateX(0);opacity:0}
+  }
+  .swipe-hint{
+    position:fixed;bottom:70px;left:50%;transform:translateX(-50%);
+    z-index:80;background:rgba(0,0,0,0.65);color:#fff;
+    font-family:"Space Mono",monospace;font-size:11px;font-weight:700;
+    letter-spacing:0.12em;padding:8px 18px;border-radius:999px;
+    pointer-events:none;opacity:0;text-transform:uppercase;
+    backdrop-filter:blur(8px);
+    animation:none;
+  }
+  .swipe-hint.show{animation:swipeHint 2.5s ease forwards}
+
+  /* ============ day card swipe on mobile ============ */
+  @media(max-width:640px){
+    #dayPlan{
+      display:flex;flex-direction:row;overflow-x:auto;
+      gap:12px;padding:4px 2px 16px;
+      scroll-snap-type:x mandatory;
+      -webkit-overflow-scrolling:touch;
+      scrollbar-width:none;
+    }
+    #dayPlan::-webkit-scrollbar{display:none}
+    .dp-card{
+      flex:0 0 88vw;scroll-snap-align:start;
+      max-width:88vw;margin-bottom:0;
+      /* always expanded on mobile */
+    }
+    .dp-body{display:block!important}
+    .dp-chev{display:none}
+    .dp-header{cursor:default}
+    /* day indicator dots */
+  }
+
+  /* ============ smooth scene transitions ============ */
+  .scene{transition:opacity 0.9s cubic-bezier(0.4,0,0.2,1), visibility 0.9s}
+  .bg-photo{transition:opacity 1s ease, transform 0.1s}
+
 </style>
 </head>
 <body>
+
+<!-- Install to home screen banner -->
+<div class="install-banner" id="installBanner">
+  📲 Add to home screen
+  <button id="installBtn">Install</button>
+  <button class="ib-close" id="installClose">×</button>
+</div>
+
+<!-- Swipe hint -->
+<div class="swipe-hint" id="swipeHint">← swipe days →</div>
+
+<!-- Countdown bar -->
+<div class="countdown-bar" id="countdownBar">
+  <span class="cd-label">🌋 Tenerife in</span>
+  <div class="cd-units">
+    <div class="cd-unit"><span class="n" id="cdDays">—</span><span class="u">days</span></div>
+    <span class="cd-sep">:</span>
+    <div class="cd-unit"><span class="n" id="cdHours">—</span><span class="u">hrs</span></div>
+    <span class="cd-sep">:</span>
+    <div class="cd-unit"><span class="n" id="cdMins">—</span><span class="u">min</span></div>
+    <span class="cd-sep">:</span>
+    <div class="cd-unit"><span class="n" id="cdSecs">—</span><span class="u">sec</span></div>
+  </div>
+  <button class="cd-dismiss" id="cdDismiss" title="Hide">×</button>
+</div>
 
 <!-- ============ TOP BAR ============ -->
 <div class="topbar">
@@ -1250,7 +1381,7 @@
     </div>
 
     <p style="margin-top:48px;font-family:'Space Mono',monospace;font-size:11px;color:var(--ink);letter-spacing:0.18em;text-transform:uppercase;text-align:center;font-weight:700">
-      Buen viaje · ← → to navigate · space to play
+      Made with love for Petra Maria de Jesus ♥
     </p>
   </div>
 </section>
@@ -2993,8 +3124,89 @@ document.getElementById("cinema").addEventListener("touchend", e=>{
 }, {passive:true});
 
 // start
+  if('scrollRestoration' in history) history.scrollRestoration = 'manual';
 go(0);
 setTimeout(startAuto, 800);
+
+// Always open at the very top of the page
+window.scrollTo({top: 0, left: 0, behavior: 'instant'});
+document.documentElement.scrollTop = 0;
+document.body.scrollTop = 0;
+/* ===== Countdown Timer ===== */
+(function(){
+  const target = new Date('2026-09-05T10:00:00'); // Sept 5 morning
+  const bar    = document.getElementById('countdownBar');
+  const elD    = document.getElementById('cdDays');
+  const elH    = document.getElementById('cdHours');
+  const elM    = document.getElementById('cdMins');
+  const elS    = document.getElementById('cdSecs');
+  const dismiss = document.getElementById('cdDismiss');
+
+  function pad(n){ return String(n).padStart(2,'0'); }
+
+  function tick(){
+    const now  = new Date();
+    const diff = target - now;
+    if(diff <= 0){
+      bar.querySelector('.cd-label').textContent = '🌴 Buen viaje Petra!';
+      elD.textContent = elH.textContent = elM.textContent = elS.textContent = '00';
+      return;
+    }
+    const d = Math.floor(diff / 86400000);
+    const h = Math.floor((diff % 86400000) / 3600000);
+    const m = Math.floor((diff % 3600000)  / 60000);
+    const s = Math.floor((diff % 60000)    / 1000);
+    elD.textContent = d;
+    elH.textContent = pad(h);
+    elM.textContent = pad(m);
+    elS.textContent = pad(s);
+  }
+
+  tick();
+  setInterval(tick, 1000);
+  document.body.classList.add('cd-visible');
+
+  dismiss.addEventListener('click', ()=>{
+    bar.classList.add('hidden');
+    document.body.classList.remove('cd-visible');
+  });
+})();
+
+/* ===== PWA Install Prompt ===== */
+(function(){
+  let deferredPrompt = null;
+  const banner  = document.getElementById('installBanner');
+  const btn     = document.getElementById('installBtn');
+  const close   = document.getElementById('installClose');
+
+  window.addEventListener('beforeinstallprompt', e=>{
+    e.preventDefault();
+    deferredPrompt = e;
+    setTimeout(()=> banner.classList.add('show'), 3000);
+  });
+
+  btn.addEventListener('click', async ()=>{
+    if(!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    deferredPrompt = null;
+    banner.classList.remove('show');
+  });
+
+  close.addEventListener('click', ()=> banner.classList.remove('show'));
+})();
+
+/* ===== Swipe hint on mobile ===== */
+(function(){
+  if(window.innerWidth > 640) return;
+  const hint = document.getElementById('swipeHint');
+  // show once after 1.5s if on day plan section
+  setTimeout(()=>{
+    hint.classList.add('show');
+    setTimeout(()=> hint.classList.remove('show'), 3000);
+  }, 1500);
+})();
+
 </script>
 
 </body>
